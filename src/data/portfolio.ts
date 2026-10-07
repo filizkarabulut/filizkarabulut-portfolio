@@ -18,7 +18,7 @@
 export const siteName = "Filiz Karabulut";
 
 /** Tagline shown in the header under the name. */
-export const tagline = "CS + Applied Math, minoring in Engineering Management";
+export const tagline = "CS + Applied Math";
 
 /** Contact email, shown with a copy button in the Contact window. */
 export const contactEmail = "filiz.karabulut@vanderbilt.edu";

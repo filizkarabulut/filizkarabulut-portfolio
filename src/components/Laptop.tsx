@@ -5,46 +5,36 @@ import { Sticker } from "./Sticker";
 
 interface LaptopProps {
   isMobile: boolean;
+  /** Section id of the currently open card, so its sticker can be highlighted. */
+  activeId: string | null;
   onOpen: (sticker: StickerData, trigger: HTMLButtonElement) => void;
 }
 
-/** Lid aspect ratios (width / height) — close to a real MacBook footprint. */
-const DESKTOP_RATIO = 7 / 5;
-const MOBILE_RATIO = 3 / 4;
-
-export function Laptop({ isMobile, onOpen }: LaptopProps) {
-  const ratio = isMobile ? MOBILE_RATIO : DESKTOP_RATIO;
+/**
+ * The laptop lid — a sticker collage that fills its wrapper (sized by the
+ * `.desk-row` around it). Aspect ratio and position are owned by the layout.
+ */
+export function Laptop({ isMobile, activeId, onOpen }: LaptopProps) {
   const layout = isMobile ? lidLayout.mobile : lidLayout.desktop;
 
   return (
-    // The laptop (lid + hinge) sized to fit the available area by BOTH width
-    // and height: width = min(available width, available height × aspect).
-    // 100cqw / 100cqh read the size-container (<main class="laptop-area">).
     <div
-      className="laptop-group"
-      style={{ "--lid-ratio": String(ratio) } as React.CSSProperties}
+      className="lid"
+      style={{
+        gridTemplateColumns: `repeat(${layout.cols}, 1fr)`,
+        gridTemplateRows: `repeat(${layout.rows}, 1fr)`,
+        gridTemplateAreas: layout.areas.map((row) => `"${row}"`).join(" "),
+      }}
     >
-      <div
-        className="lid"
-        style={{
-          aspectRatio: isMobile ? "3 / 4" : "7 / 5",
-          gridTemplateColumns: `repeat(${layout.cols}, 1fr)`,
-          gridTemplateRows: `repeat(${layout.rows}, 1fr)`,
-          gridTemplateAreas: layout.areas.map((row) => `"${row}"`).join(" "),
-        }}
-      >
-        {stickers.map((sticker, i) => (
-          <Sticker
-            key={sticker.id}
-            sticker={sticker}
-            index={i}
-            onOpen={onOpen}
-          />
-        ))}
-      </div>
-
-      {/* Hinge where the lid meets the base */}
-      <div className="hinge-strip" />
+      {stickers.map((sticker, i) => (
+        <Sticker
+          key={sticker.id}
+          sticker={sticker}
+          index={i}
+          active={Boolean(sticker.opens) && sticker.opens === activeId}
+          onOpen={onOpen}
+        />
+      ))}
     </div>
   );
 }

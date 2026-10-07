@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Header } from "@/components/Header";
 import { Laptop } from "@/components/Laptop";
-import { Window } from "@/components/Window";
+import { Card } from "@/components/Card";
 import { SectionContent } from "@/components/sections/SectionContent";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { sectionById, type Sticker } from "@/data/portfolio";
@@ -12,21 +12,23 @@ function isValidTarget(id: string): boolean {
   return Boolean(sectionById(id));
 }
 
-interface ActiveWindow {
+interface ActiveCard {
   id: string;
   highlight?: string;
 }
 
 export default function Home() {
   const isMobile = useMediaQuery("(max-width: 639px)");
-  const [active, setActive] = useState<ActiveWindow | null>(null);
+  // Below this width there is no room beside the lid -> use a bottom sheet.
+  const sideBySide = useMediaQuery("(min-width: 900px)");
+  const [active, setActive] = useState<ActiveCard | null>(null);
 
-  // Element to return focus to when the window closes.
+  // Element to return focus to when the card closes.
   const triggerRef = useRef<HTMLElement | null>(null);
   // Carries the highlight anchor across the hashchange round-trip.
-  const pending = useRef<ActiveWindow | null>(null);
+  const pending = useRef<ActiveCard | null>(null);
 
-  // Sync open window <-> URL hash (deep links + back/forward).
+  // Sync open card <-> URL hash (deep links + back/forward).
   useEffect(() => {
     const applyHash = () => {
       const h = decodeURIComponent(window.location.hash.slice(1));
@@ -73,9 +75,15 @@ export default function Home() {
 
   const onStickerOpen = useCallback(
     (sticker: Sticker, trigger: HTMLButtonElement) => {
-      if (sticker.opens) open(sticker.opens, trigger, sticker.highlight);
+      if (!sticker.opens) return;
+      // Clicking the sticker whose card is already open closes it again.
+      if (active?.id === sticker.opens) {
+        close();
+      } else {
+        open(sticker.opens, trigger, sticker.highlight);
+      }
     },
-    [open],
+    [active, open, close],
   );
 
   const onOpenContact = useCallback(
@@ -93,37 +101,57 @@ export default function Home() {
   );
 
   const section = active ? sectionById(active.id) : null;
+  const cardOpen = Boolean(active && section);
+
+  // One Card node, rendered either beside the lid or as a bottom sheet. Keeping
+  // it unkeyed means swapping sections updates props in place (no reopen); the
+  // body is keyed internally so only its content cross-fades.
+  const card =
+    active && section ? (
+      <Card
+        variant={sideBySide ? "side" : "sheet"}
+        contentKey={active.id}
+        title={section.title}
+        eyebrow={section.eyebrow}
+        subtitle={section.subtitle}
+        onClose={close}
+      >
+        <SectionContent
+          section={section}
+          highlight={active.highlight}
+          onNavigate={onNavigate}
+        />
+      </Card>
+    ) : null;
 
   return (
-    <div className="fixed inset-0 flex flex-col overflow-hidden">
-      <Header onOpenContact={onOpenContact} />
+    <div
+      className="desk"
+      data-card-open={cardOpen ? "true" : "false"}
+      style={{ "--ratio": isMobile ? "0.75" : "1.4" } as React.CSSProperties}
+    >
+      {/* Header + lid + hint share the lid's width and slide together. */}
+      <div className="desk-shift">
+        <div className="desk-header">
+          <Header onOpenContact={onOpenContact} />
+        </div>
 
-      {/* At least 24px of clear space between the header row and the laptop. */}
-      <main className="laptop-area flex min-h-0 flex-1 items-center justify-center px-2 pt-[clamp(1.5rem,3vh,2rem)] sm:px-3">
-        <Laptop isMobile={isMobile} onOpen={onStickerOpen} />
-      </main>
+        <div className="desk-row">
+          <Laptop
+            isMobile={isMobile}
+            activeId={active?.id ?? null}
+            onOpen={onStickerOpen}
+          />
+          {sideBySide && card}
+        </div>
 
-      <footer className="shrink-0 px-4 pt-1.5 pb-3 text-center">
-        <p className="font-[family-name:var(--font-mono)] text-xs text-white/70 sm:text-sm">
+        <p className="desk-hint font-[family-name:var(--font-mono)] text-xs text-white/70 sm:text-sm">
           Click a sticker to learn more.
         </p>
-      </footer>
+      </div>
 
-      {active && section && (
-        <Window
-          title={section.title}
-          eyebrow={section.eyebrow}
-          subtitle={section.subtitle}
-          isMobile={isMobile}
-          onClose={close}
-        >
-          <SectionContent
-            section={section}
-            highlight={active.highlight}
-            onNavigate={onNavigate}
-          />
-        </Window>
-      )}
+      {/* Bottom sheet (narrow screens) sits outside the sliding column. */}
+      {!sideBySide && card}
     </div>
   );
 }

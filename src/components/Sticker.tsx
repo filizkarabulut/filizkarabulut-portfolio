@@ -8,10 +8,12 @@ interface StickerProps {
   sticker: StickerData;
   /** Stagger index for the slap-on animation. */
   index: number;
+  /** True when this sticker's card is the one currently open. */
+  active?: boolean;
   onOpen: (sticker: StickerData, trigger: HTMLButtonElement) => void;
 }
 
-export function Sticker({ sticker, index, onOpen }: StickerProps) {
+export function Sticker({ sticker, index, active = false, onOpen }: StickerProps) {
   const [imgFailed, setImgFailed] = useState(false);
   const [imgLoaded, setImgLoaded] = useState(false);
   const hasImage = Boolean(sticker.image);
@@ -23,7 +25,7 @@ export function Sticker({ sticker, index, onOpen }: StickerProps) {
     "--fill": sticker.color,
   } as React.CSSProperties;
 
-  const className = `sticker shape-${sticker.shape}`;
+  const className = `sticker shape-${sticker.shape}${active ? " sticker-active" : ""}`;
 
   // The placeholder fills the cell and stays until a real image has actually
   // loaded — so a missing/slow image never flashes a broken graphic.

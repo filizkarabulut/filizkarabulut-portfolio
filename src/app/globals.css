@@ -22,7 +22,7 @@
 }
 
 /* Nothing scrolls or bounces. The page is a fixed, full-viewport surface;
-   only a window's own content area may scroll (see .window-scroll). */
+   only a card's own content area may scroll (see .window-scroll). */
 html,
 body {
   height: 100dvh;
@@ -43,7 +43,7 @@ body {
     Helvetica, Arial, sans-serif;
 }
 
-/* Scrollable region inside a window — contain scroll so it never
+/* Scrollable region inside a card — contain scroll so it never
    chains to anything behind it. */
 .window-scroll {
   overflow-y: auto;
@@ -51,20 +51,82 @@ body {
 }
 
 /* ------------------------------------------------------------------ */
-/* Laptop sizing (fit-to-viewport)                                    */
+/* Desk layout                                                        */
+/* The header, lid, and hint form one column that is exactly the lid's */
+/* width (so their edges line up). When a card opens, the column       */
+/* slides left and the card docks to the lid's right edge.             */
 /* ------------------------------------------------------------------ */
-/* The area between the header and the hint. A size-container so the
-   laptop below can read its available width (cqw) and height (cqh).
-   overflow hidden keeps shadows/glow from ever forcing the page to move. */
-.laptop-area {
-  container-type: size;
+.desk {
+  --ratio: 1.4; /* lid width / height; set per-viewport from JS */
+  --gap: 24px; /* space between the lid and the side card */
+  --pad-x: 20px; /* min breathing room at the viewport edges */
+  --card-max: 480px;
+  --card-w: clamp(300px, 34vw, var(--card-max));
+  --header-h: 52px;
+  --hint-h: 34px;
+  --v-gap: 14px;
+  --avail-h: calc(
+    100dvh - var(--header-h) - var(--hint-h) - (2 * var(--v-gap)) - 20px
+  );
+
+  /* Narrow / bottom-sheet default: the lid uses the full available width. */
+  --lid-w: min(
+    calc(100vw - (2 * var(--pad-x))),
+    calc(var(--avail-h) * var(--ratio))
+  );
+  --lid-h: calc(var(--lid-w) / var(--ratio));
+  --shift: 0px;
+
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   overflow: hidden;
 }
 
-/* lid + hinge group, sized to fit by whichever dimension is tighter. */
-.laptop-group {
-  width: min(100cqw, calc((100cqh - 18px) * var(--lid-ratio)));
+/* Wide screens: reserve room for the side card so the lid never has to
+   resize when the card opens — it only slides. */
+@media (min-width: 900px) {
+  .desk {
+    --lid-w: min(
+      calc(100vw - (2 * var(--pad-x)) - var(--gap) - var(--card-w)),
+      calc(var(--avail-h) * var(--ratio))
+    );
+    --shift: calc((var(--card-w) + var(--gap)) / 2);
+  }
+}
+
+.desk-shift {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  row-gap: var(--v-gap);
+  transform: translateX(0);
+  transition: transform 400ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.desk[data-card-open="true"] .desk-shift {
+  transform: translateX(calc(-1 * var(--shift)));
+}
+
+/* Header + hint match the lid's width exactly, so edges line up. */
+.desk-header,
+.desk-hint {
+  width: var(--lid-w);
   max-width: 100%;
+}
+.desk-hint {
+  text-align: center;
+  margin: 0;
+}
+
+/* The lid row — the lid, with the side card docked to its right edge. */
+.desk-row {
+  position: relative;
+  width: var(--lid-w);
+  height: var(--lid-h);
+  /* A size container so the lid's own cq-based padding/radius resolve here. */
+  container-type: size;
 }
 
 /* ------------------------------------------------------------------ */
@@ -72,6 +134,8 @@ body {
 /* ------------------------------------------------------------------ */
 .lid {
   position: relative;
+  width: 100%;
+  height: 100%;
   container-type: size;
   container-name: lid;
   display: grid;
@@ -114,19 +178,6 @@ body {
   box-shadow: inset 0 0 6cqmin rgba(90, 100, 115, 0.12);
 }
 
-/* The hinge strip where the lid meets the base. */
-.hinge-strip {
-  width: 80%;
-  height: 1.4cqmin;
-  min-height: 6px;
-  margin: 1px auto 0;
-  border-radius: 0 0 1.4cqmin 1.4cqmin;
-  background: linear-gradient(180deg, #787d84 0%, #50545a 55%, #3a3d42 100%);
-  box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.15) inset,
-    0 5px 10px rgba(0, 0, 0, 0.6);
-}
-
 /* ------------------------------------------------------------------ */
 /* Stickers — packed collage; each fills its grid-area cell           */
 /* ------------------------------------------------------------------ */
@@ -160,6 +211,23 @@ body {
 .sticker:focus-visible .sticker-img {
   outline: 3px solid #3b82f6;
   outline-offset: 2px;
+}
+
+/* Active sticker (its card is open): a soft glow so it's clear which is open. */
+.sticker-active {
+  z-index: 30;
+}
+.sticker-active .sticker-placeholder {
+  box-shadow:
+    0 4px 10px rgba(0, 0, 0, 0.35),
+    0 0 0 3px rgba(255, 255, 255, 0.95),
+    0 0 20px 5px rgba(120, 170, 255, 0.8);
+}
+.sticker-active .sticker-img {
+  filter:
+    drop-shadow(1px 0 0 #fff) drop-shadow(-1px 0 0 #fff)
+    drop-shadow(0 1px 0 #fff) drop-shadow(0 -1px 0 #fff)
+    drop-shadow(0 0 9px rgba(120, 170, 255, 0.95));
 }
 
 /* External-link indicator for link stickers (GitHub, LinkedIn). */
@@ -267,32 +335,130 @@ body {
 }
 
 /* ------------------------------------------------------------------ */
-/* Windows                                                            */
+/* Card (section content)                                             */
 /* ------------------------------------------------------------------ */
-@keyframes window-pop {
-  from {
-    opacity: 0;
-    transform: translateY(8px) scale(0.98);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-.window-pop {
-  animation: window-pop 180ms ease-out both;
+.deck-card {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.97);
+  color: var(--color-ink);
+  border-radius: 14px;
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.08),
+    0 30px 60px -22px rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(20px);
 }
 
-@keyframes backdrop-in {
+/* Docked beside the lid: same top & bottom as the lid; fills remaining width. */
+.deck-card--side {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: calc(100% + var(--gap));
+  width: var(--card-w);
+  animation: card-in 280ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Bottom sheet on narrow screens — over the lower part of the screen. */
+.deck-card--sheet {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: min(66dvh, 560px);
+  border-radius: 18px 18px 0 0;
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.08),
+    0 -18px 50px -16px rgba(0, 0, 0, 0.6);
+  z-index: 60;
+  animation: sheet-in 300ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes card-in {
+  from {
+    opacity: 0;
+    transform: translateX(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+@keyframes sheet-in {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+.deck-card__bar {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  background: linear-gradient(180deg, #f6f6f7, #e9eaec);
+  user-select: none;
+}
+.deck-close {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 14px;
+  height: 14px;
+  border-radius: 999px;
+  background: #ff5f57;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.12);
+  color: rgba(0, 0, 0, 0.5);
+  font-size: 9px;
+  line-height: 1;
+}
+.deck-close span {
+  opacity: 0;
+  transition: opacity 120ms ease;
+}
+.deck-close:hover span,
+.deck-close:focus-visible span {
+  opacity: 1;
+}
+.deck-close:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+.deck-card__title {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.7);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.deck-card__spacer {
+  flex: none;
+  width: 14px;
+}
+.deck-card__scroll {
+  flex: 1;
+  min-height: 0;
+}
+.deck-card__body {
+  animation: body-fade 220ms ease-out both;
+}
+@keyframes body-fade {
   from {
     opacity: 0;
   }
   to {
     opacity: 1;
   }
-}
-.backdrop-in {
-  animation: backdrop-in 160ms ease-out both;
 }
 
 /* Highlight a section anchor when opened from an interest sticker. */
@@ -318,8 +484,12 @@ body {
     animation: none !important;
     transition: none !important;
   }
-  .window-pop,
-  .backdrop-in,
+  .desk-shift {
+    transition: none !important;
+  }
+  .deck-card--side,
+  .deck-card--sheet,
+  .deck-card__body,
   .anchor-flash {
     animation: none !important;
   }
