@@ -1,157 +1,183 @@
-"use client";
+import Link from "next/link";
+import type { ReactNode } from "react";
+import { Shell } from "@/components/Shell";
+import { Reveal } from "@/components/Reveal";
+import { CopyEmail } from "@/components/CopyEmail";
+import { CommandPalette } from "@/components/CommandPalette";
+import { ConsoleGreeting } from "@/components/ConsoleGreeting";
+import { SiteFooter } from "@/components/SiteFooter";
+import {
+  about,
+  education,
+  experience,
+  featuredCaseStudies,
+  githubUrl,
+  linkedinUrl,
+  offTheClock,
+  resumeUrl,
+} from "@/data/portfolio";
 
-import { useCallback, useEffect, useRef, useState } from "react";
-import { Header } from "@/components/Header";
-import { Laptop } from "@/components/Laptop";
-import { Card } from "@/components/Card";
-import { SectionContent } from "@/components/sections/SectionContent";
-import { useMediaQuery } from "@/hooks/useMediaQuery";
-import { sectionById, type Sticker } from "@/data/portfolio";
-
-function isValidTarget(id: string): boolean {
-  return Boolean(sectionById(id));
-}
-
-interface ActiveCard {
+/** A top-level page section: focusable (for scroll-to) with a mono eyebrow. */
+function Section({
+  id,
+  title,
+  children,
+}: {
   id: string;
-  highlight?: string;
+  title: string;
+  children: ReactNode;
+}) {
+  return (
+    <section id={id} tabIndex={-1} className="section" aria-labelledby={`${id}-h`}>
+      <div className="section-inner">
+        <h2 id={`${id}-h`} className="section-head">
+          <span className="section-head__mark" aria-hidden="true">
+            #
+          </span>
+          {title}
+        </h2>
+        {children}
+      </div>
+    </section>
+  );
 }
 
 export default function Home() {
-  const isMobile = useMediaQuery("(max-width: 639px)");
-  // Below this width there is no room beside the lid -> use a bottom sheet.
-  const sideBySide = useMediaQuery("(min-width: 900px)");
-  const [active, setActive] = useState<ActiveCard | null>(null);
-
-  // Element to return focus to when the card closes.
-  const triggerRef = useRef<HTMLElement | null>(null);
-  // Carries the highlight anchor across the hashchange round-trip.
-  const pending = useRef<ActiveCard | null>(null);
-
-  // Sync open card <-> URL hash (deep links + back/forward).
-  useEffect(() => {
-    const applyHash = () => {
-      const h = decodeURIComponent(window.location.hash.slice(1));
-      if (h && isValidTarget(h)) {
-        const highlight =
-          pending.current?.id === h ? pending.current.highlight : undefined;
-        setActive({ id: h, highlight });
-      } else {
-        setActive(null);
-      }
-    };
-    applyHash();
-    window.addEventListener("hashchange", applyHash);
-    return () => window.removeEventListener("hashchange", applyHash);
-  }, []);
-
-  const open = useCallback(
-    (id: string, trigger?: HTMLElement | null, highlight?: string) => {
-      if (!isValidTarget(id)) return;
-      if (trigger) triggerRef.current = trigger;
-      pending.current = { id, highlight };
-      if (window.location.hash.slice(1) === id) {
-        setActive({ id, highlight });
-      } else {
-        window.location.hash = id;
-      }
-    },
-    [],
-  );
-
-  const close = useCallback(() => {
-    pending.current = null;
-    // Drop the hash without leaving a "#" or a dangling history entry.
-    window.history.replaceState(
-      null,
-      "",
-      window.location.pathname + window.location.search,
-    );
-    setActive(null);
-    const t = triggerRef.current;
-    triggerRef.current = null;
-    t?.focus();
-  }, []);
-
-  const onStickerOpen = useCallback(
-    (sticker: Sticker, trigger: HTMLButtonElement) => {
-      if (!sticker.opens) return;
-      // Clicking the sticker whose card is already open closes it again.
-      if (active?.id === sticker.opens) {
-        close();
-      } else {
-        open(sticker.opens, trigger, sticker.highlight);
-      }
-    },
-    [active, open, close],
-  );
-
-  const onOpenContact = useCallback(
-    (trigger: HTMLButtonElement) => {
-      open("contact", trigger);
-    },
-    [open],
-  );
-
-  const onNavigate = useCallback(
-    (sectionId: string) => {
-      open(sectionId);
-    },
-    [open],
-  );
-
-  const section = active ? sectionById(active.id) : null;
-  const cardOpen = Boolean(active && section);
-
-  // One Card node, rendered either beside the lid or as a bottom sheet. Keeping
-  // it unkeyed means swapping sections updates props in place (no reopen); the
-  // body is keyed internally so only its content cross-fades.
-  const card =
-    active && section ? (
-      <Card
-        variant={sideBySide ? "side" : "sheet"}
-        contentKey={active.id}
-        title={section.title}
-        eyebrow={section.eyebrow}
-        subtitle={section.subtitle}
-        onClose={close}
-      >
-        <SectionContent
-          section={section}
-          highlight={active.highlight}
-          onNavigate={onNavigate}
-        />
-      </Card>
-    ) : null;
+  const work = featuredCaseStudies();
 
   return (
-    <div
-      className="desk"
-      data-card-open={cardOpen ? "true" : "false"}
-      style={{ "--ratio": isMobile ? "0.75" : "1.4" } as React.CSSProperties}
-    >
-      {/* Header + lid + hint share the lid's width and slide together. */}
-      <div className="desk-shift">
-        <div className="desk-header">
-          <Header onOpenContact={onOpenContact} />
-        </div>
+    <main className="page">
+      <Shell>
+        <Section id="about" title="About">
+        <Reveal>
+          <p className="prose">{about.lead}</p>
+          <p className="currently">
+            <span className="currently__k mono">Currently</span>
+            {about.currently}
+          </p>
+        </Reveal>
+      </Section>
 
-        <div className="desk-row">
-          <Laptop
-            isMobile={isMobile}
-            activeId={active?.id ?? null}
-            onOpen={onStickerOpen}
-          />
-          {sideBySide && card}
-        </div>
+      <Section id="work" title="Work">
+        <Reveal>
+          <ul className="work-list">
+            {work.map((c) => (
+              <li key={c.slug} className="work-card">
+                <div className="work-card__head">
+                  <h3 className="work-card__title">{c.title}</h3>
+                  <span className="work-card__time mono">{c.timeline}</span>
+                </div>
+                <p className="work-card__summary">{c.summary}</p>
+                <dl className="kv">
+                  <div>
+                    <dt className="mono">Role</dt>
+                    <dd>{c.role}</dd>
+                  </div>
+                  {c.team && (
+                    <div>
+                      <dt className="mono">Team</dt>
+                      <dd>{c.team}</dd>
+                    </div>
+                  )}
+                </dl>
+                <ul className="tag-row" aria-label="Stack">
+                  {c.stack.map((t) => (
+                    <li key={t} className="tag mono">
+                      {t}
+                    </li>
+                  ))}
+                </ul>
+                <Link href={`/work/${c.slug}`} className="read-link">
+                  Read case study <span aria-hidden="true">→</span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </Reveal>
+      </Section>
 
-        <p className="desk-hint font-[family-name:var(--font-mono)] text-xs text-white/70 sm:text-sm">
-          Click a sticker to learn more.
-        </p>
-      </div>
+      <Section id="experience" title="Experience">
+        <Reveal>
+          <ol className="timeline">
+            {experience.map((e, i) => (
+              <li key={i} className="timeline-item">
+                <div className="timeline-head">
+                  <p className="timeline-roleline">
+                    <span className="timeline-role">{e.role}</span>
+                    <span className="timeline-org"> · {e.org}</span>
+                  </p>
+                  <span className="timeline-dates mono">{e.dates}</span>
+                </div>
+                {e.lines.map((l, j) => (
+                  <p key={j} className="timeline-line">
+                    {l}
+                  </p>
+                ))}
+              </li>
+            ))}
+          </ol>
+        </Reveal>
+      </Section>
 
-      {/* Bottom sheet (narrow screens) sits outside the sliding column. */}
-      {!sideBySide && card}
-    </div>
+      <Section id="education" title="Education">
+        <Reveal>
+          <div className="edu">
+            <div className="timeline-head">
+              <p className="timeline-roleline">
+                <span className="timeline-role">{education.school}</span>
+              </p>
+              <span className="timeline-dates mono">{education.dates}</span>
+            </div>
+            <p className="timeline-line">{education.degree}</p>
+            <p className="timeline-line">{education.minor}</p>
+            <ul className="tag-row" aria-label="Honors">
+              {education.honors.map((h) => (
+                <li key={h} className="tag mono">
+                  {h}
+                </li>
+              ))}
+            </ul>
+            {education.note && <p className="edu-note">{education.note}</p>}
+          </div>
+        </Reveal>
+      </Section>
+
+      <Section id="play" title="Off the clock">
+        <Reveal>
+          <p className="prose">{offTheClock}</p>
+        </Reveal>
+      </Section>
+
+      <Section id="contact" title="Contact">
+        <Reveal>
+          <div className="contact">
+            <CopyEmail />
+            <ul className="contact-links">
+              <li>
+                <a href={githubUrl} target="_blank" rel="noopener noreferrer">
+                  GitHub <span aria-hidden="true">↗</span>
+                </a>
+              </li>
+              <li>
+                <a href={linkedinUrl} target="_blank" rel="noopener noreferrer">
+                  LinkedIn <span aria-hidden="true">↗</span>
+                </a>
+              </li>
+              <li>
+                <a href={resumeUrl} target="_blank" rel="noopener noreferrer">
+                  Résumé <span aria-hidden="true">↗</span>
+                </a>
+              </li>
+            </ul>
+          </div>
+        </Reveal>
+        </Section>
+
+        <SiteFooter />
+      </Shell>
+
+      <CommandPalette />
+      <ConsoleGreeting />
+    </main>
   );
 }

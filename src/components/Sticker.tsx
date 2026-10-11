@@ -6,26 +6,46 @@ import type { Sticker as StickerData } from "@/data/portfolio";
 
 interface StickerProps {
   sticker: StickerData;
-  /** Stagger index for the slap-on animation. */
+  /** Stagger index for the slap-on animation (lid only). */
   index: number;
-  /** True when this sticker's card is the one currently open. */
-  active?: boolean;
-  onOpen: (sticker: StickerData, trigger: HTMLButtonElement) => void;
+  /** True when this sticker maps to the section currently in view. */
+  active: boolean;
+  onOpen: (sticker: StickerData) => void;
+  /** Where this sticker leads, shown as a tooltip on hover/focus (lid only). */
+  tip?: string;
+  /** Compact chip variant used in the mobile sticky nav bar. */
+  mini?: boolean;
 }
 
-export function Sticker({ sticker, index, active = false, onOpen }: StickerProps) {
+export function Sticker({
+  sticker,
+  index,
+  active,
+  onOpen,
+  tip,
+  mini = false,
+}: StickerProps) {
   const [imgFailed, setImgFailed] = useState(false);
   const [imgLoaded, setImgLoaded] = useState(false);
   const hasImage = Boolean(sticker.image);
 
-  // Placement comes from the lid's grid-template-areas (keyed by id).
-  const style = {
-    gridArea: sticker.id,
-    "--delay": `${120 + index * 45}ms`,
-    "--fill": sticker.color,
-  } as React.CSSProperties;
+  // In the lid, placement comes from grid-template-areas (keyed by id). Mini
+  // chips flow in the nav bar instead, so they get no grid area or stagger.
+  const style = mini
+    ? ({ "--fill": sticker.color } as React.CSSProperties)
+    : ({
+        gridArea: sticker.id,
+        "--delay": `${120 + index * 45}ms`,
+        "--fill": sticker.color,
+      } as React.CSSProperties);
 
-  const className = `sticker shape-${sticker.shape}${active ? " sticker-active" : ""}`;
+  // Link stickers (GitHub/LinkedIn) never become active; everything else dims
+  // when another section is the active one.
+  const className = [
+    mini ? "sticker-mini" : "sticker",
+    `shape-${sticker.shape}`,
+    active ? "is-active" : "is-dimmed",
+  ].join(" ");
 
   // The placeholder fills the cell and stays until a real image has actually
   // loaded — so a missing/slow image never flashes a broken graphic.
@@ -48,7 +68,7 @@ export function Sticker({ sticker, index, active = false, onOpen }: StickerProps
           className="sticker-img"
           onLoad={() => setImgLoaded(true)}
           onError={() => setImgFailed(true)}
-          priority={sticker.size === "XL"}
+          priority={!mini && sticker.size === "XL"}
           style={
             imgLoaded
               ? undefined
@@ -60,6 +80,11 @@ export function Sticker({ sticker, index, active = false, onOpen }: StickerProps
                 }
           }
         />
+      )}
+      {tip && !mini && (
+        <span className="sticker-tip" aria-hidden="true">
+          {tip}
+        </span>
       )}
     </>
   );
@@ -76,9 +101,11 @@ export function Sticker({ sticker, index, active = false, onOpen }: StickerProps
         style={style}
       >
         {inner}
-        <span className="sticker-ext" aria-hidden="true">
-          ↗
-        </span>
+        {!mini && (
+          <span className="sticker-ext" aria-hidden="true">
+            ↗
+          </span>
+        )}
       </a>
     );
   }
@@ -87,7 +114,8 @@ export function Sticker({ sticker, index, active = false, onOpen }: StickerProps
     <button
       type="button"
       aria-label={sticker.ariaLabel}
-      onClick={(e) => onOpen(sticker, e.currentTarget)}
+      aria-current={active ? "true" : undefined}
+      onClick={() => onOpen(sticker)}
       className={className}
       style={style}
     >

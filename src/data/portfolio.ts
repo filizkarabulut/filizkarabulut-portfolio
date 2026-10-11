@@ -1,14 +1,9 @@
 /**
  * Single source of truth for the whole site.
  *
- * To update the portfolio you should only ever need to edit this file and drop
- * images into /public/stickers/. Components render this data; they do not hold
- * content of their own.
- *
- *   - `sections`  -> the content shown inside each macOS-style window.
- *   - `stickers`  -> the clickable stickers on the laptop lid.
- *
- * Anything still marked `todo:` below is a placeholder for Filiz to fill in.
+ * Layout lives in components; everything a human would want to edit — copy,
+ * links, case-study content, the sticker lid — lives here. Anything marked
+ * `TODO:` is a placeholder for Filiz to fill in. Do not invent facts or metrics.
  */
 
 /* ------------------------------------------------------------------ */
@@ -17,355 +12,503 @@
 
 export const siteName = "Filiz Karabulut";
 
-/** Tagline shown in the header under the name. */
-export const tagline = "CS + Applied Math";
+/** Tagline shown under the name in the left column. */
+export const tagline = "CS + Applied Math, minoring in Engineering Management";
 
-/** Contact email, shown with a copy button in the Contact window. */
+/** Contact email, shown with a copy button in the Contact section. */
 export const contactEmail = "filiz.karabulut@vanderbilt.edu";
 
-/** Profile + file links. Keep these as the one place to edit URLs. */
+/** Profile + file links. The one place to edit URLs. */
 export const githubUrl = "https://github.com/"; // TODO: your GitHub profile URL
 export const linkedinUrl = "https://www.linkedin.com/"; // TODO: your LinkedIn profile URL
 export const resumeUrl = "/resume.pdf"; // TODO: add resume.pdf to /public/
+export const repoUrl = "https://github.com/"; // TODO: this repository's URL ("view source")
 
 /* ------------------------------------------------------------------ */
-/* Sections (window content)                                          */
+/* Navigation sections (anchors on the home page)                     */
 /* ------------------------------------------------------------------ */
 
-/** A piece of content inside a window. Rendered by SectionContent. */
-export type ContentBlock =
-  | { type: "paragraph"; text: string }
-  | { type: "heading"; text: string; anchor?: string }
-  | { type: "list"; items: string[] }
-  | { type: "meta"; items: { label: string; value: string }[] }
-  | { type: "links"; links: LinkItem[] }
-  | { type: "tags"; items: string[] }
-  | { type: "note"; text: string }
-  /** A clearly-marked placeholder for Filiz to fill in later. */
-  | { type: "todo"; text: string };
+export interface NavSection {
+  id: string;
+  label: string;
+}
 
-export interface LinkItem {
+/** Order here = order of sections below the hero, and in the command palette. */
+export const navSections: NavSection[] = [
+  { id: "about", label: "About" },
+  { id: "work", label: "Work" },
+  { id: "experience", label: "Experience" },
+  { id: "education", label: "Education" },
+  { id: "play", label: "Off the clock" },
+  { id: "contact", label: "Contact" },
+];
+
+/* ------------------------------------------------------------------ */
+/* About                                                              */
+/* ------------------------------------------------------------------ */
+
+export const about = {
+  /** 2–3 sentences, read in a narrow column. */
+  lead: "TODO: 2–3 sentence intro — who you are, what you build, and what you care about. Keep it plain and specific.",
+  /** A small, easily-updated status line. */
+  currently:
+    "AI Engineer Intern at Vanderbilt's AMPLIFY GenAI Innovation Center.",
+};
+
+/* ------------------------------------------------------------------ */
+/* Case studies (Selected Work + /work/[slug] pages)                  */
+/* ------------------------------------------------------------------ */
+
+export interface CaseStudyLink {
   label: string;
   href: string;
-  /** Marks a link whose URL is still a placeholder. */
   todo?: boolean;
 }
 
-export interface Section {
-  /** Stable id, also used as the URL hash (e.g. "amplify" -> /#amplify). */
+/** A box in an architecture diagram, placed in the diagram's viewBox space. */
+export interface DiagramNode {
   id: string;
-  /** Window title bar text. */
-  title: string;
-  /** Small mono label above the title (optional). */
-  eyebrow?: string;
-  /** Secondary line under the title, e.g. role or dates (optional). */
-  subtitle?: string;
-  blocks: ContentBlock[];
+  label: string;
+  x: number;
+  y: number;
+  w: number;
+  h: number;
 }
 
-export const sections: Section[] = [
+export interface DiagramEdge {
+  from: string;
+  to: string;
+  label?: string;
+  /** Dashed = a secondary / feedback path. */
+  dashed?: boolean;
+}
+
+export interface Diagram {
+  /** SVG viewBox, e.g. "0 0 1320 240". */
+  viewBox: string;
+  nodes: DiagramNode[];
+  edges: DiagramEdge[];
+  /** Short caption; also used as the diagram's accessible description. */
+  caption: string;
+}
+
+/** A tradeoff: what was chosen, why, and what it cost. */
+export interface Decision {
+  choice: string;
+  why: string;
+  cost: string;
+}
+
+export interface CaseStudy {
+  slug: string;
+  title: string;
+  /** One-line summary used on the card and the detail header. */
+  summary: string;
+  role: string;
+  /** Monospace, e.g. a date range or event. */
+  timeline: string;
+  team?: string;
+  /** Monospace stack tags. */
+  stack: string[];
+  links?: CaseStudyLink[];
+  /** Show on the home "Selected Work" list. */
+  featured?: boolean;
+
+  /* Detail page ------------------------------------------------ */
+  /** What needed solving and why it mattered. One string per paragraph. */
+  problem: string[];
+  architecture: {
+    diagram?: Diagram;
+    explanation: string[];
+  };
+  decisions: Decision[];
+  challenges: string[];
+  results: string[];
+}
+
+export const caseStudies: CaseStudy[] = [
   {
-    id: "about",
-    title: "About",
-    eyebrow: "{ FK }",
-    subtitle: "Filiz Karabulut",
-    blocks: [
-      {
-        type: "meta",
-        items: [
-          { label: "Studying", value: "CS + Applied Mathematics" },
-          { label: "At", value: "Vanderbilt University" },
-          { label: "Based in", value: "Nashville, TN (via Istanbul)" },
+    slug: "amplify-collab",
+    title: "AMPLIFY Collab",
+    summary:
+      "Real-time room intelligence: AI agents that listen, watch the whiteboard, and contribute ideas live.",
+    role: "AI Engineer Intern",
+    timeline: "TODO: start – end",
+    team: "AMPLIFY GenAI Innovation Center · TODO: team size",
+    stack: [
+      "Python",
+      "AWS Bedrock",
+      "Nova Sonic 2",
+      "GPT Realtime",
+      "faster-whisper",
+      "OpenCV",
+      "Amazon Polly",
+    ],
+    links: [
+      { label: "Demo", href: "#", todo: true },
+      { label: "Repo", href: "#", todo: true },
+    ],
+    featured: true,
+    problem: [
+      "Collab is a real-time room intelligence tool: AI agents listen to a meeting, watch a whiteboard through a webcam, and proactively contribute ideas and build artifacts while the conversation is still happening.",
+      "TODO: Add the motivating problem — who this is for and why proactive, multimodal agents beat a passive transcript or a chat you have to prompt.",
+    ],
+    architecture: {
+      diagram: {
+        viewBox: "0 0 1320 240",
+        nodes: [
+          { id: "mic", label: "Microphone", x: 0, y: 24, w: 150, h: 56 },
+          { id: "cam", label: "Webcam", x: 0, y: 150, w: 150, h: 56 },
+          {
+            id: "trans",
+            label: "Transcription — Nova Sonic 2 (Bedrock)",
+            x: 200,
+            y: 24,
+            w: 240,
+            h: 56,
+          },
+          {
+            id: "wb",
+            label: "Whiteboard — OpenCV frame diff",
+            x: 200,
+            y: 150,
+            w: 240,
+            h: 56,
+          },
+          {
+            id: "trigger",
+            label: "Event-driven trigger loop",
+            x: 490,
+            y: 88,
+            w: 180,
+            h: 56,
+          },
+          {
+            id: "gate",
+            label: "Topic maturity gate (2-stage)",
+            x: 720,
+            y: 88,
+            w: 200,
+            h: 56,
+          },
+          { id: "agents", label: "Agents", x: 970, y: 88, w: 120, h: 56 },
+          {
+            id: "artifacts",
+            label: "Artifacts",
+            x: 1140,
+            y: 24,
+            w: 180,
+            h: 56,
+          },
+          {
+            id: "tts",
+            label: "TTS — Polly (priority queue)",
+            x: 1140,
+            y: 150,
+            w: 180,
+            h: 56,
+          },
         ],
-      },
-      {
-        type: "todo",
-        text: "Write a 2-3 sentence personal intro: who you are, what you build, and what you care about.",
-      },
-      { type: "heading", text: "What I'm up to" },
-      {
-        type: "list",
-        items: [
-          "AI Engineer Intern at Vanderbilt's AMPLIFY GenAI Innovation Center",
-          "President of VandyHacks",
-          "Building AI tools like SpIQ and Ask VALIANT",
+        edges: [
+          { from: "mic", to: "trans" },
+          { from: "cam", to: "wb" },
+          { from: "trans", to: "trigger" },
+          { from: "wb", to: "trigger" },
+          { from: "trigger", to: "gate" },
+          { from: "gate", to: "agents" },
+          { from: "agents", to: "artifacts" },
+          { from: "agents", to: "tts" },
         ],
+        caption:
+          "Audio and webcam feeds are processed in parallel, merged into an event-driven trigger loop, gated by a two-stage topic-maturity check, then handed to agents that produce artifacts and speak back through a priority-queued TTS.",
       },
+      explanation: [
+        "Two input streams run in parallel: audio is transcribed (now Nova Sonic 2 on AWS Bedrock) and the whiteboard is tracked with OpenCV frame differencing so only real changes register.",
+        "An event-driven trigger loop decides when something is worth acting on. A two-stage topic-maturity gate holds agents back until a topic is developed enough to contribute to, which keeps them from interrupting with half-formed ideas.",
+        'An "agent" wake word lets people ask the agents a direct question at any time. Spoken responses go through Amazon Polly behind a priority queue so urgent replies are not stuck behind long ones.',
+      ],
+    },
+    decisions: [
+      {
+        choice:
+          "Migrated transcription from self-hosted faster-whisper → GPT Realtime → Amazon Nova Sonic 2 on AWS Bedrock.",
+        why: "TODO: why Nova Sonic 2 won — latency, streaming quality, accuracy, cost, or ops burden?",
+        cost: "TODO: what the migration cost — rework, vendor lock-in, tuning, or behavior changes.",
+      },
+      {
+        choice:
+          "Tracked the whiteboard with OpenCV frame differencing instead of streaming every frame to a vision model.",
+        why: "TODO: confirm the reason (e.g. only react to real changes; avoid per-frame model cost and latency).",
+        cost: "TODO: what it gives up (sensitivity to lighting/motion, no semantic understanding of the drawing).",
+      },
+      {
+        choice:
+          "Gated contributions behind a two-stage topic-maturity check before any agent speaks.",
+        why: "TODO: confirm — reduce interruptions and avoid low-value or premature suggestions.",
+        cost: "TODO: added latency before the agent can contribute; risk of missing a fast-moving moment.",
+      },
+      {
+        choice:
+          'Added an "agent" wake word for direct questions and a priority queue in front of Polly TTS.',
+        why: "TODO: confirm — give people an explicit way in, and keep urgent speech from queueing behind long replies.",
+        cost: "TODO: wake-word false positives/misses; queue policy complexity.",
+      },
+    ],
+    challenges: [
+      "TODO: the hardest bug or problem in the event-driven trigger loop (races, duplicate triggers, ordering) and how you solved it.",
+      "TODO: tuning the topic-maturity gate so agents felt helpful rather than noisy.",
+      "TODO: anything tricky in synchronizing audio, transcription, and whiteboard events in real time.",
+    ],
+    results: [
+      "TODO: outcomes — who used it, what it enabled, any latency or quality numbers (don't estimate; leave blank until measured).",
+      "TODO: what you'd do next.",
     ],
   },
   {
-    id: "amplify",
-    title: "AMPLIFY GenAI Innovation Center",
-    eyebrow: "Experience",
-    subtitle: "AI Engineer Intern · Vanderbilt University",
-    blocks: [
-      {
-        type: "meta",
-        items: [
-          { label: "Role", value: "AI Engineer Intern" },
-          { label: "Org", value: "AMPLIFY GenAI Innovation Center" },
-          { label: "Dates", value: "TODO: start – end" },
+    slug: "code-interpreter-migration",
+    title: "Code Interpreter Migration",
+    summary:
+      "Replaced an OpenAI Assistants code interpreter with sandboxed Python on AWS AgentCore.",
+    role: "AI Engineer Intern",
+    timeline: "TODO: start – end",
+    team: "AMPLIFY GenAI Innovation Center · TODO: team size",
+    stack: ["Python", "AWS AgentCore", "Amazon DynamoDB", "Amazon S3"],
+    links: [{ label: "Repo", href: "#", todo: true }],
+    featured: true,
+    problem: [
+      "The product relied on OpenAI's Assistants API for its code interpreter. This project replaced it with sandboxed Python execution on AWS AgentCore.",
+      "TODO: Add why the migration mattered — control, cost, data residency, consistency with the rest of the AWS stack, or limits you hit with Assistants.",
+    ],
+    architecture: {
+      diagram: {
+        viewBox: "0 0 1200 240",
+        nodes: [
+          { id: "agent", label: "Agent / LLM", x: 0, y: 92, w: 150, h: 56 },
+          {
+            id: "loop",
+            label: "Multi-round tool loop",
+            x: 200,
+            y: 92,
+            w: 180,
+            h: 56,
+          },
+          {
+            id: "sandbox",
+            label: "Sandboxed Python — AgentCore",
+            x: 430,
+            y: 92,
+            w: 230,
+            h: 56,
+          },
+          {
+            id: "dynamo",
+            label: "DynamoDB — session state",
+            x: 710,
+            y: 24,
+            w: 200,
+            h: 56,
+          },
+          {
+            id: "s3",
+            label: "S3 — file persistence",
+            x: 710,
+            y: 160,
+            w: 200,
+            h: 56,
+          },
+          {
+            id: "renew",
+            label: "Session renewal + context rebuild",
+            x: 960,
+            y: 92,
+            w: 230,
+            h: 56,
+          },
         ],
+        edges: [
+          { from: "agent", to: "loop" },
+          { from: "loop", to: "sandbox" },
+          { from: "sandbox", to: "dynamo" },
+          { from: "sandbox", to: "s3" },
+          { from: "dynamo", to: "renew" },
+          { from: "s3", to: "renew" },
+          { from: "renew", to: "sandbox", label: "restore", dashed: true },
+        ],
+        caption:
+          "An agent drives a multi-round tool loop over sandboxed Python on AgentCore; session state lives in DynamoDB and files in S3, and on expiry the session is renewed by restoring files and rebuilding context.",
+      },
+      explanation: [
+        "The agent drives a multi-round tool loop: it calls the sandbox, reads results, and calls again until the task is done. Execution runs in sandboxed Python on AWS AgentCore.",
+        "Session state is tracked in DynamoDB and generated files are persisted to S3, so a session's work survives beyond a single call. When a session expires it is renewed and its context is rebuilt.",
+        "Key finding: in-memory Python state can't survive session expiry. Rather than trying to serialize a live interpreter, the system restores the persisted files and rebuilds context from them.",
+      ],
+    },
+    decisions: [
+      {
+        choice:
+          "Rebuilt the interpreter as a multi-round tool loop over sandboxed Python on AgentCore.",
+        why: "TODO: confirm — move execution into the AWS stack with real sandboxing and control over the loop.",
+        cost: "TODO: owning sandbox lifecycle, tool-loop orchestration, and error handling you previously got for free.",
       },
       {
-        type: "todo",
-        text: "Describe what AMPLIFY is and what you do there in 1-2 sentences.",
-      },
-      { type: "heading", text: "Highlights" },
-      {
-        type: "todo",
-        text: "List 2-4 concrete things you built or shipped (tools, models, pipelines, impact/metrics).",
+        choice:
+          "Stored session state in DynamoDB and persisted files to S3 instead of keeping state in the process.",
+        why: "Durable session state and files that outlive any single execution or a sandbox restart.",
+        cost: "TODO: extra round-trips and the complexity of keeping DynamoDB/S3 consistent with the sandbox.",
       },
       {
-        type: "tags",
-        items: ["Generative AI", "TODO: tech", "TODO: tech"],
+        choice:
+          "On session expiry, restore files and rebuild context instead of persisting in-memory interpreter state.",
+        why: "In-memory Python state can't survive session expiry, so persisting files and rebuilding is the reliable path.",
+        cost: "TODO: rebuild latency on renewal and any state that can't be reconstructed from files alone.",
       },
+    ],
+    challenges: [
+      "In-memory Python state is lost when a session expires — solved by persisting files to S3 and rebuilding context on renewal rather than trying to keep the interpreter alive.",
+      "TODO: the hardest bug in the multi-round tool loop or session renewal (timeouts, partial writes, re-entrancy) and how you fixed it.",
+    ],
+    results: [
+      "TODO: outcomes — parity with the old interpreter, reliability across session renewals, cost or latency differences (measure before claiming).",
+      "TODO: what you'd do next.",
     ],
   },
   {
-    id: "spiq",
+    slug: "spiq",
     title: "SpIQ",
-    eyebrow: "Project",
-    subtitle: "AI communication coach · Team OFSET",
-    blocks: [
+    summary: "AI communication coach — 1st Place & Hacker's Choice at HackMT 2026.",
+    role: "TODO: your role",
+    timeline: "HackMT 2026",
+    team: "OFSET",
+    stack: ["TODO: stack", "TODO: stack"],
+    links: [
+      { label: "Live demo", href: "#", todo: true },
+      { label: "Devpost", href: "#", todo: true },
+      { label: "Repo", href: "#", todo: true },
+    ],
+    featured: true,
+    problem: [
+      "SpIQ is an AI communication coach, built with team OFSET at HackMT 2026, where it won 1st Place and Hacker's Choice.",
+      "TODO: What does SpIQ coach, for whom, and what problem does it solve? 2–3 sentences.",
+    ],
+    architecture: {
+      explanation: [
+        "TODO: Describe how SpIQ works end to end — inputs, models, and how feedback is produced.",
+      ],
+    },
+    decisions: [
       {
-        type: "meta",
-        items: [
-          { label: "Award", value: "1st Place & Hacker's Choice — HackMT 2026" },
-          { label: "Team", value: "OFSET" },
-          { label: "Role", value: "TODO: your role" },
-        ],
+        choice: "TODO: a key technical choice you made",
+        why: "TODO: why",
+        cost: "TODO: what it cost",
       },
-      {
-        type: "paragraph",
-        text: "SpIQ is an AI communication coach built with team OFSET. It won 1st Place and Hacker's Choice at HackMT 2026.",
-      },
-      {
-        type: "todo",
-        text: "Add 2-3 sentences: what SpIQ does, how it works, and the problem it solves.",
-      },
-      { type: "heading", text: "Built with" },
-      { type: "tags", items: ["TODO: tech", "TODO: tech", "TODO: tech"] },
-      {
-        type: "links",
-        links: [
-          { label: "Live demo", href: "#", todo: true },
-          { label: "Devpost / write-up", href: "#", todo: true },
-          { label: "GitHub repo", href: "#", todo: true },
-        ],
-      },
+    ],
+    challenges: [
+      "TODO: the hardest problem you solved during the hackathon.",
+    ],
+    results: [
+      "1st Place & Hacker's Choice, HackMT 2026.",
+      "TODO: what you'd build next if you kept going.",
     ],
   },
   {
-    id: "leadership",
-    title: "VandyHacks",
-    eyebrow: "Leadership",
-    subtitle: "President",
-    blocks: [
-      {
-        type: "meta",
-        items: [
-          { label: "Role", value: "President" },
-          { label: "Org", value: "VandyHacks — Vanderbilt's hackathon community" },
-          { label: "Dates", value: "TODO: term" },
-        ],
-      },
-      {
-        type: "todo",
-        text: "Describe your involvement: what VandyHacks is, what you lead, team size, event scale (attendees, sponsors).",
-      },
-      { type: "heading", text: "Impact" },
-      {
-        type: "todo",
-        text: "List 2-3 highlights (events organized, growth, initiatives you started).",
-      },
-      {
-        type: "links",
-        links: [{ label: "vandyhacks.org", href: "#", todo: true }],
-      },
-    ],
-  },
-  {
-    id: "education",
-    title: "Education",
-    eyebrow: "Vanderbilt University",
-    subtitle: "B.S. Computer Science & Applied Mathematics",
-    blocks: [
-      {
-        type: "meta",
-        items: [
-          { label: "School", value: "Vanderbilt University" },
-          { label: "Degree", value: "B.S. Computer Science & Applied Mathematics" },
-          { label: "Minor", value: "Engineering Management" },
-          { label: "Expected", value: "May 2029" },
-        ],
-      },
-      { type: "heading", text: "Relevant coursework" },
-      {
-        type: "todo",
-        text: "List notable courses (algorithms, ML, linear algebra, etc.).",
-      },
-      { type: "heading", text: "Honors & activities" },
-      {
-        type: "todo",
-        text: "GPA (optional), scholarships, honors, clubs.",
-      },
-    ],
-  },
-  {
-    id: "ai",
-    title: "AI",
-    eyebrow: "Interest",
-    subtitle: "What draws me to artificial intelligence",
-    blocks: [
-      {
-        type: "todo",
-        text: "Write 2-4 sentences on what excites you about AI and the kind of problems you want to work on.",
-      },
-      { type: "heading", text: "My AI work" },
-      {
-        type: "list",
-        items: [
-          "SpIQ — AI communication coach (HackMT 2026 winner)",
-          "Ask VALIANT — AI research discovery",
-          "AMPLIFY — AI Engineer internship at Vanderbilt",
-        ],
-      },
-      {
-        type: "links",
-        links: [
-          { label: "SpIQ", href: "#spiq" },
-          { label: "Ask VALIANT", href: "#valiant" },
-          { label: "AMPLIFY", href: "#amplify" },
-        ],
-      },
-    ],
-  },
-  {
-    id: "valiant",
+    slug: "ask-valiant",
     title: "Ask VALIANT",
-    eyebrow: "Project",
-    subtitle: "AI research discovery",
-    blocks: [
+    summary: "AI research discovery. TODO: one-line summary.",
+    role: "TODO: your role",
+    timeline: "TODO: start – end",
+    team: "TODO: team",
+    stack: ["TODO: stack"],
+    links: [{ label: "Repo", href: "#", todo: true }],
+    featured: true,
+    problem: [
+      "TODO: What is Ask VALIANT, who is it for, and what research-discovery problem does it solve?",
+    ],
+    architecture: {
+      explanation: ["TODO: Describe the architecture and how it works."],
+    },
+    decisions: [
       {
-        type: "paragraph",
-        text: "Ask VALIANT is an AI research discovery project — a smarter way to search and surface research.",
-      },
-      {
-        type: "todo",
-        text: "Add 2-3 sentences: what Ask VALIANT does, who it's for, and how it works.",
-      },
-      { type: "heading", text: "Built with" },
-      { type: "tags", items: ["TODO: tech", "TODO: tech", "TODO: tech"] },
-      {
-        type: "links",
-        links: [
-          { label: "Live", href: "#", todo: true },
-          { label: "GitHub repo", href: "#", todo: true },
-        ],
+        choice: "TODO: a key technical choice",
+        why: "TODO: why",
+        cost: "TODO: what it cost",
       },
     ],
-  },
-  {
-    id: "vuit",
-    title: "Vanderbilt University IT",
-    eyebrow: "Experience",
-    subtitle: "Vanderbilt University Information Technology (VUIT)",
-    blocks: [
-      {
-        type: "meta",
-        items: [
-          { label: "Role", value: "TODO: your title" },
-          { label: "Org", value: "Vanderbilt University Information Technology" },
-          { label: "Dates", value: "TODO: start – end" },
-        ],
-      },
-      {
-        type: "todo",
-        text: "Describe what you do at VUIT: support, systems, tooling, scripts, who you help.",
-      },
-      {
-        type: "tags",
-        items: ["TODO: tech", "TODO: tech"],
-      },
-    ],
-  },
-  {
-    id: "projects",
-    title: "Projects",
-    eyebrow: 'git commit -m "build cool things"',
-    subtitle: "Things I've built",
-    blocks: [
-      { type: "heading", text: "SpIQ", anchor: "p-spiq" },
-      {
-        type: "paragraph",
-        text: "AI communication coach · 1st Place & Hacker's Choice, HackMT 2026. See the SpIQ window for details.",
-      },
-      { type: "heading", text: "Ask VALIANT", anchor: "p-valiant" },
-      {
-        type: "paragraph",
-        text: "AI research discovery. See the Ask VALIANT window for details.",
-      },
-      { type: "heading", text: "More", anchor: "p-more" },
-      {
-        type: "todo",
-        text: "Add any other projects (name, one-line description, link).",
-      },
-      {
-        type: "links",
-        links: [{ label: "GitHub", href: githubUrl, todo: true }],
-      },
-    ],
-  },
-  {
-    id: "off-the-clock",
-    title: "Off the clock",
-    eyebrow: "Interests",
-    subtitle: "What I get up to away from the keyboard",
-    blocks: [
-      { type: "heading", text: "Violin", anchor: "violin" },
-      {
-        type: "todo",
-        text: "A line or two about playing violin — how long, what you play, ensembles.",
-      },
-      { type: "heading", text: "Hiking", anchor: "hiking" },
-      {
-        type: "todo",
-        text: "A line or two about hiking — favorite trails, parks, trips.",
-      },
-      { type: "heading", text: "Film", anchor: "film" },
-      {
-        type: "todo",
-        text: "A line or two about films & series you love.",
-      },
-    ],
-  },
-  {
-    id: "contact",
-    title: "Contact",
-    eyebrow: "Say hello",
-    subtitle: "Get in touch",
-    blocks: [
-      {
-        type: "note",
-        text: "Email has a copy button in this window.",
-      },
-      {
-        type: "links",
-        links: [
-          { label: "GitHub", href: githubUrl, todo: true },
-          { label: "LinkedIn", href: linkedinUrl, todo: true },
-        ],
-      },
-    ],
+    challenges: ["TODO: the hardest problem and how you solved it."],
+    results: ["TODO: outcomes and next steps."],
   },
 ];
 
 /* ------------------------------------------------------------------ */
-/* Stickers (clickable lid)                                           */
+/* Experience (timeline)                                              */
 /* ------------------------------------------------------------------ */
 
-/** Importance tier -> controls size. Sizes live in CSS, not here. */
+export interface ExperienceEntry {
+  role: string;
+  org: string;
+  /** Monospace, right-aligned. */
+  dates: string;
+  /** 1–2 short lines. */
+  lines: string[];
+}
+
+export const experience: ExperienceEntry[] = [
+  {
+    role: "AI Engineer Intern",
+    org: "AMPLIFY GenAI Innovation Center",
+    dates: "TODO: dates",
+    lines: [
+      "Build real-time, multimodal AI agents for meetings (Collab) and migrated the product's code interpreter to sandboxed Python on AWS AgentCore.",
+    ],
+  },
+  {
+    role: "TODO: your title",
+    org: "Vanderbilt University IT (VUIT)",
+    dates: "TODO: dates",
+    lines: ["TODO: 1–2 lines on what you do at VUIT."],
+  },
+  {
+    role: "President",
+    org: "VandyHacks",
+    dates: "TODO: dates",
+    lines: [
+      "Lead Vanderbilt's student hackathon community.",
+      "TODO: scale — team size, event attendance, sponsors, or initiatives you started.",
+    ],
+  },
+  {
+    role: "Social Chair",
+    org: "VUWiSE",
+    dates: "TODO: dates",
+    lines: ["TODO: 1–2 lines on what you organize for VUWiSE."],
+  },
+];
+
+/* ------------------------------------------------------------------ */
+/* Education                                                          */
+/* ------------------------------------------------------------------ */
+
+export const education = {
+  school: "Vanderbilt University",
+  degree: "B.S. Computer Science & Applied Mathematics",
+  minor: "Minor in Engineering Management",
+  dates: "Expected May 2029",
+  honors: ["VALIANT AI Scholar"],
+  /** Optional extra line. */
+  note: "TODO: notable coursework, GPA, or other honors (optional).",
+};
+
+/* ------------------------------------------------------------------ */
+/* Off the clock                                                      */
+/* ------------------------------------------------------------------ */
+
+export const offTheClock =
+  "Away from the keyboard: playing violin, getting out on hiking trails, and watching (probably too much) film.";
+
+/* ------------------------------------------------------------------ */
+/* Stickers (clickable lid) — now shortcuts that scroll to a section  */
+/* ------------------------------------------------------------------ */
+
+/** Importance tier -> controls size (via the layout). */
 export type SizeTier = "XL" | "L" | "M" | "S";
 
 /** Placeholder silhouette used when no image is available. */
@@ -374,13 +517,7 @@ export type StickerShape = "circle" | "rounded" | "tag";
 /**
  * The lid is a CSS grid; stickers are packed collage-style by placing each one
  * into a named grid area. `areas` is one string per row — each token is a
- * sticker `id` (so a sticker spans every cell showing its id) or "." for an
- * open cell. This is the whole layout: edit these strings to repack the lid.
- *
- * Tiers come out of how many cells a sticker covers: FK (XL) is the big 4×4
- * block dead-center, the four L stickers are 2×2 corners, the M stickers are
- * 2×1 / 1×2 pills, and the S stickers are single cells. No id may form a
- * non-rectangular region, and every id below must appear in each layout.
+ * sticker `id` or "." for an open cell. Edit these strings to repack the lid.
  */
 export interface LidLayout {
   cols: number;
@@ -389,8 +526,6 @@ export interface LidLayout {
 }
 
 export const lidLayout: { desktop: LidLayout; mobile: LidLayout } = {
-  // 8 × 6, landscape. FK 4×4 centered; L in the four corners; M pills across
-  // the top and bottom; S single cells tucked into the corners.
   desktop: {
     cols: 8,
     rows: 6,
@@ -403,8 +538,6 @@ export const lidLayout: { desktop: LidLayout; mobile: LidLayout } = {
       "film    github   github     git-commit  git-commit linkedin linkedin  .",
     ],
   },
-  // 6 × 8, portrait. Same idea, stacked taller; side M stickers become tall
-  // 1×2 pills.
   mobile: {
     cols: 6,
     rows: 8,
@@ -424,34 +557,26 @@ export const lidLayout: { desktop: LidLayout; mobile: LidLayout } = {
 export interface Sticker {
   /** Stable id — also its grid-area name in `lidLayout`. */
   id: string;
-  /** Text shown on the placeholder and used in the aria-label. */
   label: string;
-  /** Full accessible description, e.g. "VandyHacks sticker — opens Leadership". */
   ariaLabel: string;
-  /** Path under /public, e.g. "/stickers/vandyhacks.svg". Optional. */
   image?: string;
-  /** Importance tier (documents the hierarchy; sizing comes from the layout). */
   size: SizeTier;
-  /** Placeholder silhouette / border-radius: circle, rounded rect, or pill. */
   shape: StickerShape;
-  /** Soft fill color for the placeholder (CSS color). */
   color: string;
-  /** Section id this sticker opens (omit for link stickers). */
+  /** Home-page section id this sticker scrolls to (omit for link stickers). */
   opens?: string;
-  /** Optional anchor within the section to scroll to / highlight. */
-  highlight?: string;
-  /**
-   * If set, the sticker is an external link that opens this URL in a new tab
-   * instead of opening a window. (GitHub, LinkedIn, etc.)
-   */
+  /** If set, the sticker is an external link opened in a new tab. */
   href?: string;
 }
+
+// To use real sticker art: drop files in /public/stickers and add e.g.
+//   image: "/stickers/fk.svg"
+// to a sticker below. Until then the colored placeholders are shown.
 export const stickers: Sticker[] = [
   {
     id: "fk",
     label: "{ FK }",
-    ariaLabel: "FK logo sticker — opens About",
-    image: "/stickers/fk.svg",
+    ariaLabel: "FK logo sticker — jump to About",
     size: "XL",
     shape: "rounded",
     color: "#1f2937",
@@ -460,38 +585,34 @@ export const stickers: Sticker[] = [
   {
     id: "amplify",
     label: "AMPLIFY",
-    ariaLabel: "AMPLIFY sticker — opens my AMPLIFY internship experience",
-    image: "/stickers/amplify.svg",
+    ariaLabel: "AMPLIFY sticker — jump to Experience",
     size: "L",
     shape: "rounded",
     color: "#7c3aed",
-    opens: "amplify",
+    opens: "experience",
   },
   {
     id: "spiq",
     label: "SpIQ",
-    ariaLabel: "SpIQ sticker — opens the SpIQ project",
-    image: "/stickers/spiq.svg",
+    ariaLabel: "SpIQ sticker — jump to Work",
     size: "L",
     shape: "circle",
     color: "#0ea5e9",
-    opens: "spiq",
+    opens: "work",
   },
   {
     id: "vandyhacks",
     label: "VandyHacks",
-    ariaLabel: "VandyHacks sticker — opens Leadership",
-    image: "/stickers/vandyhacks.svg",
+    ariaLabel: "VandyHacks sticker — jump to Experience",
     size: "L",
     shape: "rounded",
     color: "#f59e0b",
-    opens: "leadership",
+    opens: "experience",
   },
   {
     id: "vanderbilt",
     label: "Vanderbilt",
-    ariaLabel: "Vanderbilt sticker — opens Education",
-    image: "/stickers/vanderbilt.svg",
+    ariaLabel: "Vanderbilt sticker — jump to Education",
     size: "L",
     shape: "rounded",
     color: "#b45309",
@@ -500,48 +621,43 @@ export const stickers: Sticker[] = [
   {
     id: "ai",
     label: "AI",
-    ariaLabel: "Neural network sticker — opens my interest in AI",
-    image: "/stickers/ai.svg",
+    ariaLabel: "Neural network sticker — jump to Work",
     size: "M",
     shape: "circle",
     color: "#10b981",
-    opens: "ai",
+    opens: "work",
   },
   {
     id: "valiant",
     label: "Ask VALIANT",
-    ariaLabel: "Ask VALIANT sticker — opens the Ask VALIANT project",
-    image: "/stickers/valiant.svg",
+    ariaLabel: "Ask VALIANT sticker — jump to Work",
     size: "M",
     shape: "rounded",
     color: "#6366f1",
-    opens: "valiant",
+    opens: "work",
   },
   {
     id: "vuit",
     label: "VUIT",
-    ariaLabel: "IT sticker — opens my work with Vanderbilt University IT",
-    image: "/stickers/vuit.svg",
+    ariaLabel: "IT sticker — jump to Experience",
     size: "M",
     shape: "rounded",
     color: "#334155",
-    opens: "vuit",
+    opens: "experience",
   },
   {
     id: "git-commit",
     label: 'git commit -m "build cool things"',
-    ariaLabel: "git commit sticker — opens Projects and my GitHub",
-    image: "/stickers/git-commit.svg",
+    ariaLabel: "git commit sticker — jump to Work",
     size: "M",
     shape: "tag",
     color: "#0f172a",
-    opens: "projects",
+    opens: "work",
   },
   {
     id: "github",
     label: "GitHub",
     ariaLabel: "GitHub sticker — opens my GitHub profile in a new tab",
-    image: "/stickers/github.svg",
     size: "M",
     shape: "circle",
     color: "#24292f",
@@ -551,7 +667,6 @@ export const stickers: Sticker[] = [
     id: "linkedin",
     label: "LinkedIn",
     ariaLabel: "LinkedIn sticker — opens my LinkedIn profile in a new tab",
-    image: "/stickers/linkedin.svg",
     size: "M",
     shape: "rounded",
     color: "#0a66c2",
@@ -560,41 +675,38 @@ export const stickers: Sticker[] = [
   {
     id: "violin",
     label: "Violin",
-    ariaLabel: "Violin sticker — opens Off the clock, highlighting violin",
-    image: "/stickers/violin.svg",
+    ariaLabel: "Violin sticker — jump to Off the clock",
     size: "S",
     shape: "rounded",
     color: "#92400e",
-    opens: "off-the-clock",
-    highlight: "violin",
+    opens: "play",
   },
   {
     id: "hiking",
     label: "Hiking",
-    ariaLabel: "Mountain sticker — opens Off the clock, highlighting hiking",
-    image: "/stickers/hiking.svg",
+    ariaLabel: "Mountain sticker — jump to Off the clock",
     size: "S",
     shape: "circle",
     color: "#15803d",
-    opens: "off-the-clock",
-    highlight: "hiking",
+    opens: "play",
   },
   {
     id: "film",
     label: "Film",
-    ariaLabel: "Film strip sticker — opens Off the clock, highlighting film",
-    image: "/stickers/film.svg",
+    ariaLabel: "Film strip sticker — jump to Off the clock",
     size: "S",
     shape: "rounded",
     color: "#7e22ce",
-    opens: "off-the-clock",
-    highlight: "film",
+    opens: "play",
   },
 ];
 
-/** Look up helpers. */
-export const sectionById = (id: string): Section | undefined =>
-  sections.find((s) => s.id === id);
+/* ------------------------------------------------------------------ */
+/* Lookups                                                            */
+/* ------------------------------------------------------------------ */
 
-export const stickerForSection = (id: string): Sticker | undefined =>
-  stickers.find((s) => s.opens === id);
+export const caseStudyBySlug = (slug: string): CaseStudy | undefined =>
+  caseStudies.find((c) => c.slug === slug);
+
+export const featuredCaseStudies = (): CaseStudy[] =>
+  caseStudies.filter((c) => c.featured);

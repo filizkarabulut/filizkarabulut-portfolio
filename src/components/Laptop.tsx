@@ -1,20 +1,39 @@
 "use client";
 
-import { lidLayout, stickers, type Sticker as StickerData } from "@/data/portfolio";
+import {
+  lidLayout,
+  navSections,
+  stickers,
+  type Sticker as StickerData,
+} from "@/data/portfolio";
 import { Sticker } from "./Sticker";
 
 interface LaptopProps {
   isMobile: boolean;
-  /** Section id of the currently open card, so its sticker can be highlighted. */
-  activeId: string | null;
-  onOpen: (sticker: StickerData, trigger: HTMLButtonElement) => void;
+  /** The section currently in view — the matching sticker(s) light up. */
+  activeSection: string;
+  onOpen: (sticker: StickerData) => void;
+}
+
+/** section id -> human label, for the per-sticker tooltip. */
+const SECTION_LABEL = new Map(navSections.map((s) => [s.id, s.label]));
+
+/** Short "where it leads" hint shown on hover/focus. */
+function tipFor(sticker: StickerData): string | undefined {
+  if (sticker.opens) {
+    const label = SECTION_LABEL.get(sticker.opens);
+    return label ? `${label} →` : undefined;
+  }
+  if (sticker.href) return `${sticker.label} ↗`;
+  return undefined;
 }
 
 /**
- * The laptop lid — a sticker collage that fills its wrapper (sized by the
- * `.desk-row` around it). Aspect ratio and position are owned by the layout.
+ * The laptop lid — a sticker collage that fills its wrapper and is the site's
+ * only navigation. Each sticker is a shortcut to a section; the sticker(s) for
+ * the active section light up while the rest dim.
  */
-export function Laptop({ isMobile, activeId, onOpen }: LaptopProps) {
+export function Laptop({ isMobile, activeSection, onOpen }: LaptopProps) {
   const layout = isMobile ? lidLayout.mobile : lidLayout.desktop;
 
   return (
@@ -31,7 +50,8 @@ export function Laptop({ isMobile, activeId, onOpen }: LaptopProps) {
           key={sticker.id}
           sticker={sticker}
           index={i}
-          active={Boolean(sticker.opens) && sticker.opens === activeId}
+          active={sticker.opens === activeSection}
+          tip={tipFor(sticker)}
           onOpen={onOpen}
         />
       ))}

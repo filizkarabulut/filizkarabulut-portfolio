@@ -28,11 +28,16 @@ const siteDescription =
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://filizkarabulut.com"),
-  title: "Filiz Karabulut",
+  title: {
+    default: "Filiz Karabulut",
+    template: "%s",
+  },
   description: siteDescription,
+  alternates: { canonical: "/" },
   openGraph: {
     title: "Filiz Karabulut",
     description: siteDescription,
+    url: "/",
     type: "website",
     siteName: "Filiz Karabulut",
   },
@@ -47,9 +52,18 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      className={`${display.variable} ${body.variable} ${mono.variable} h-full antialiased`}
+      suppressHydrationWarning
+      className={`${display.variable} ${body.variable} ${mono.variable} antialiased`}
     >
-      <body className="h-dvh overflow-hidden">{children}</body>
+      <body>
+        {/* Mark that JS is on, before paint, so scroll-reveal never flashes. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: "document.documentElement.classList.add('js')",
+          }}
+        />
+        {children}
+      </body>
     </html>
   );
 }

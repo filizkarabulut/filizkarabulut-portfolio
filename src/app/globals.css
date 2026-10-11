@@ -7,126 +7,227 @@
   --font-display: var(--font-display);
   --font-body: var(--font-body);
   --font-mono: var(--font-mono);
-
-  /* The one background color — change this to re-theme the whole canvas. */
   --color-canvas: #000000;
-  --color-lid-1: #e8eaed;
-  --color-lid-2: #c7ccd3;
-  --color-lid-3: #aeb4bd;
-  --color-ink: #1b1d21;
 }
 
 :root {
-  --background: var(--color-canvas);
-  --foreground: #1b1d21;
+  --bg: #000000;
+  --fg: #e8eaf0;
+  --muted: #9aa3af;
+  --faint: #6b7280;
+  --line: rgba(255, 255, 255, 0.12);
+  --line-soft: rgba(255, 255, 255, 0.07);
+  --accent: #8ab4ff;
+  --panel: rgba(255, 255, 255, 0.03);
 }
 
-/* Nothing scrolls or bounces. The page is a fixed, full-viewport surface;
-   only a card's own content area may scroll (see .window-scroll). */
-html,
-body {
-  height: 100dvh;
-  overflow: hidden;
-  overscroll-behavior: none;
+/* ------------------------------------------------------------------ */
+/* Base                                                               */
+/* ------------------------------------------------------------------ */
+html {
+  scroll-padding-top: 2rem;
+  -webkit-text-size-adjust: 100%;
+}
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
 }
 
 body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
   font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
-  color: var(--foreground);
-  background: var(--color-canvas);
+  line-height: 1.6;
+  overscroll-behavior-y: none;
+  /* `clip` contains hover-scaled stickers horizontally without creating a
+     scroll container (which would break the sticky left column). */
+  overflow-x: clip;
 }
 
-/* System font for window chrome (traffic lights / title bars). */
+.mono {
+  font-family: var(--font-mono), ui-monospace, monospace;
+}
+
+a {
+  color: inherit;
+}
+
+/* One consistent, visible focus ring across the whole site. */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 3px;
+}
+
+/* System font for the laptop's window chrome. */
 .chrome-font {
   font-family:
     -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto,
     Helvetica, Arial, sans-serif;
 }
 
-/* Scrollable region inside a card — contain scroll so it never
-   chains to anything behind it. */
-.window-scroll {
-  overflow-y: auto;
-  overscroll-behavior: contain;
+/* ------------------------------------------------------------------ */
+/* Two-column layout                                                  */
+/* ------------------------------------------------------------------ */
+.page {
+  min-height: 100dvh;
 }
 
-/* ------------------------------------------------------------------ */
-/* Desk layout                                                        */
-/* The header, lid, and hint form one column that is exactly the lid's */
-/* width (so their edges line up). When a card opens, the column       */
-/* slides left and the card docks to the lid's right edge.             */
-/* ------------------------------------------------------------------ */
-.desk {
-  --ratio: 1.4; /* lid width / height; set per-viewport from JS */
-  --gap: 24px; /* space between the lid and the side card */
-  --pad-x: 20px; /* min breathing room at the viewport edges */
-  --card-max: 480px;
-  --card-w: clamp(300px, 34vw, var(--card-max));
-  --header-h: 52px;
-  --hint-h: 34px;
-  --v-gap: 14px;
-  --avail-h: calc(
-    100dvh - var(--header-h) - var(--hint-h) - (2 * var(--v-gap)) - 20px
-  );
-
-  /* Narrow / bottom-sheet default: the lid uses the full available width. */
-  --lid-w: min(
-    calc(100vw - (2 * var(--pad-x))),
-    calc(var(--avail-h) * var(--ratio))
-  );
-  --lid-h: calc(var(--lid-w) / var(--ratio));
-  --shift: 0px;
-
-  position: fixed;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
+/* Mobile-first: one stacked column (laptop on top, sections below). */
+.layout {
+  display: block;
+}
+.layout__left {
+  padding: 2rem 1.25rem 1.5rem;
 }
 
-/* Wide screens: reserve room for the side card so the lid never has to
-   resize when the card opens — it only slides. */
-@media (min-width: 900px) {
-  .desk {
-    --lid-w: min(
-      calc(100vw - (2 * var(--pad-x)) - var(--gap) - var(--card-w)),
-      calc(var(--avail-h) * var(--ratio))
-    );
-    --shift: calc((var(--card-w) + var(--gap)) / 2);
+@media (min-width: 1024px) {
+  .layout {
+    display: grid;
+    grid-template-columns: 38% 62%;
+    align-items: start; /* so the sticky left cell keeps its own height */
+  }
+  .layout__left {
+    position: sticky;
+    top: 0;
+    height: 100dvh;
+    overflow-x: clip; /* contain hover-scaled stickers without a scrollbar */
+    overflow-y: auto; /* safety valve on short viewports */
+    padding: 2.25rem clamp(1.5rem, 2.5vw, 2.5rem) 2rem;
+    border-right: 1px solid var(--line-soft);
   }
 }
 
-.desk-shift {
+/* The left column's inner stack, aligned to the laptop's left/right edges.
+   Full width below 1024px (laptop at the top); fills the column on desktop. */
+.sidebar {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  row-gap: var(--v-gap);
-  transform: translateX(0);
-  transition: transform 400ms cubic-bezier(0.22, 1, 0.36, 1);
+  gap: 1.5rem;
+  width: 100%;
 }
-.desk[data-card-open="true"] .desk-shift {
-  transform: translateX(calc(-1 * var(--shift)));
+@media (min-width: 1024px) {
+  .sidebar {
+    height: 100%;
+  }
 }
 
-/* Header + hint match the lid's width exactly, so edges line up. */
-.desk-header,
-.desk-hint {
-  width: var(--lid-w);
-  max-width: 100%;
+.sidebar-id {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
-.desk-hint {
-  text-align: center;
+.sidebar-name {
   margin: 0;
+  font-family: var(--font-display), sans-serif;
+  font-size: clamp(1.4rem, 1.4rem + 0.8vw, 1.9rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  color: #fff;
+}
+.sidebar-tagline {
+  margin: 0;
+  font-family: var(--font-mono), monospace;
+  font-size: 0.76rem;
+  line-height: 1.5;
+  color: var(--muted);
 }
 
-/* The lid row — the lid, with the side card docked to its right edge. */
-.desk-row {
+/* Stage holds the laptop. On desktop it grows to fill the space between the
+   identity and the actions, centering the laptop vertically. */
+.sidebar-stage {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+@media (min-width: 1024px) {
+  .sidebar-stage {
+    flex: 1;
+    min-height: 0;
+  }
+}
+
+/* Laptop wrapper — width-driven (as large as the column allows), its aspect
+   ratio sets the height. */
+.sidebar-lid {
+  --ratio: 1.4;
   position: relative;
-  width: var(--lid-w);
-  height: var(--lid-h);
-  /* A size container so the lid's own cq-based padding/radius resolve here. */
-  container-type: size;
+  width: 100%;
+  aspect-ratio: var(--ratio);
+}
+
+/* ---- Left-column actions ---- */
+.sidebar-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  font-size: 0.9rem;
+}
+.sidebar-action {
+  color: rgba(255, 255, 255, 0.82);
+  text-decoration: none;
+  transition: color 140ms ease;
+}
+.sidebar-action:hover {
+  color: #fff;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+/* ---- Mobile sticky top bar — mini stickers ---- */
+.topnav {
+  display: none;
+}
+@media (max-width: 1023px) {
+  .topnav {
+    display: block;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: rgba(0, 0, 0, 0.82);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--line-soft);
+  }
+  .topnav__list {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    list-style: none;
+    margin: 0;
+    padding: 0.55rem 1rem;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .topnav__list::-webkit-scrollbar {
+    display: none;
+  }
+  .topnav__list > li {
+    flex: 0 0 auto;
+    display: flex;
+  }
+}
+
+.kbd-hint {
+  font-family: var(--font-mono), monospace;
+  font-size: 0.72rem;
+  color: var(--muted);
+  background: transparent;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 2px 7px;
+  cursor: pointer;
+  transition:
+    color 140ms ease,
+    border-color 140ms ease;
+}
+.kbd-hint:hover {
+  color: var(--fg);
+  border-color: rgba(255, 255, 255, 0.3);
 }
 
 /* ------------------------------------------------------------------ */
@@ -142,33 +243,23 @@ body {
   padding: 2cqmin;
   gap: 1cqmin;
   border-radius: 3.4cqmin;
-  overflow: hidden;
+  overflow: visible; /* let sticker tooltips escape the lid */
   background:
-    /* fine brushed-aluminum lines */
     repeating-linear-gradient(
       90deg,
       rgba(255, 255, 255, 0.05) 0 1.5px,
       rgba(0, 0, 0, 0.022) 1.5px 3px
     ),
-    /* base silver, lit from the top */
-    linear-gradient(
-      157deg,
-      #eef1f4 0%,
-      #dce0e5 40%,
-      #c6cbd2 72%,
-      #b6bbc3 100%
-    );
+    linear-gradient(157deg, #eef1f4 0%, #dce0e5 40%, #c6cbd2 72%, #b6bbc3 100%);
   border: 1px solid rgba(255, 255, 255, 0.35);
   box-shadow:
     inset 0 2px 1px rgba(255, 255, 255, 0.8),
-    /* soft highlight along the top edge */ inset 0 -3px 3px rgba(0, 0, 0, 0.14),
+    inset 0 -3px 3px rgba(0, 0, 0, 0.14),
     inset 3px 0 5px rgba(0, 0, 0, 0.07),
     inset -3px 0 5px rgba(0, 0, 0, 0.07),
-    /* slightly darker edges */ 0 0 110px -14px rgba(205, 220, 242, 0.35),
-    /* glow on black */ 0 38px 72px -26px rgba(0, 0, 0, 0.85); /* drop shadow */
+    0 0 110px -14px rgba(205, 220, 242, 0.35),
+    0 38px 72px -26px rgba(0, 0, 0, 0.85);
 }
-
-/* Darkened vignette at the very edges for a machined look. */
 .lid::before {
   content: "";
   position: absolute;
@@ -179,7 +270,7 @@ body {
 }
 
 /* ------------------------------------------------------------------ */
-/* Stickers — packed collage; each fills its grid-area cell           */
+/* Stickers                                                           */
 /* ------------------------------------------------------------------ */
 .sticker {
   position: relative;
@@ -190,17 +281,37 @@ body {
   border: none;
   background: transparent;
   text-decoration: none;
-  transition: transform 160ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition:
+    transform 200ms cubic-bezier(0.34, 1.56, 0.64, 1),
+    opacity 200ms ease,
+    filter 200ms ease;
   cursor: pointer;
-  /* "Slap" onto the lid on load — starts visible, never fades in. No tilt. */
   animation: sticker-slap 320ms cubic-bezier(0.2, 0.9, 0.3, 1.4) both;
   animation-delay: var(--delay, 0ms);
   will-change: transform;
 }
 
-/* Lift on hover/focus — straight, no rotation. */
+/* Active-section highlighting — the stickers are the only navigation now, so
+   the match for the section in view lifts and glows; everything else dims. */
+.sticker.is-dimmed {
+  opacity: 0.6;
+}
+.sticker.is-active {
+  opacity: 1;
+  transform: translateY(-4px) scale(1.04);
+  z-index: 30;
+}
+.sticker.is-active .sticker-placeholder,
+.sticker.is-active .sticker-img {
+  box-shadow:
+    0 0 0 2px rgba(255, 255, 255, 0.45),
+    0 0 30px 0 rgba(138, 180, 255, 0.95);
+}
+
+/* Hover / focus always win over the active-lift, so pointer feedback is clear. */
 .sticker:hover,
 .sticker:focus-visible {
+  opacity: 1;
   transform: scale(1.06);
   z-index: 40;
 }
@@ -213,24 +324,6 @@ body {
   outline-offset: 2px;
 }
 
-/* Active sticker (its card is open): a soft glow so it's clear which is open. */
-.sticker-active {
-  z-index: 30;
-}
-.sticker-active .sticker-placeholder {
-  box-shadow:
-    0 4px 10px rgba(0, 0, 0, 0.35),
-    0 0 0 3px rgba(255, 255, 255, 0.95),
-    0 0 20px 5px rgba(120, 170, 255, 0.8);
-}
-.sticker-active .sticker-img {
-  filter:
-    drop-shadow(1px 0 0 #fff) drop-shadow(-1px 0 0 #fff)
-    drop-shadow(0 1px 0 #fff) drop-shadow(0 -1px 0 #fff)
-    drop-shadow(0 0 9px rgba(120, 170, 255, 0.95));
-}
-
-/* External-link indicator for link stickers (GitHub, LinkedIn). */
 .sticker-ext {
   position: absolute;
   top: -5%;
@@ -261,8 +354,77 @@ body {
   transform: scale(1);
 }
 
-/* Real image: fills the cell (contain), white die-cut outline + shadow.
-   Transparent art — no square background, so nothing shows at the corners. */
+/* Destination tooltip shown on hover / keyboard focus (lid stickers only). */
+.sticker-tip {
+  position: absolute;
+  bottom: calc(100% + 7px);
+  left: 50%;
+  transform: translate(-50%, 4px);
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: #0c0d10;
+  border: 1px solid var(--line);
+  color: var(--fg);
+  font-family: var(--font-mono), monospace;
+  font-size: 0.64rem;
+  line-height: 1.3;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity 140ms ease,
+    transform 140ms ease;
+  z-index: 60;
+}
+.sticker:hover .sticker-tip,
+.sticker:focus-visible .sticker-tip {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+/* Mini stickers in the mobile sticky bar. */
+.sticker-mini {
+  position: relative;
+  width: 42px;
+  height: 42px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  container-type: size;
+  transition:
+    opacity 200ms ease,
+    transform 200ms ease;
+}
+.sticker-mini.is-dimmed {
+  opacity: 0.6;
+}
+.sticker-mini.is-active {
+  opacity: 1;
+  transform: translateY(-1px) scale(1.06);
+  z-index: 2;
+}
+.sticker-mini .sticker-placeholder {
+  border-width: 1.5px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+.sticker-mini.is-active .sticker-placeholder {
+  box-shadow:
+    0 0 0 1.5px rgba(255, 255, 255, 0.5),
+    0 0 12px 0 rgba(138, 180, 255, 0.9);
+}
+.sticker-mini .placeholder-label {
+  font-size: clamp(0.38rem, 15cqmin, 0.56rem);
+}
+.sticker-mini:focus-visible {
+  outline: none;
+}
+.sticker-mini:focus-visible .sticker-placeholder,
+.sticker-mini:focus-visible .sticker-img {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
 .sticker-img {
   width: 100%;
   height: 100%;
@@ -274,8 +436,6 @@ body {
     drop-shadow(0 5px 5px rgba(0, 0, 0, 0.35));
 }
 
-/* Placeholder: fills the cell, clipped to the sticker's shape, transparent
-   outside that shape (the clip is what keeps the corners clean). */
 .sticker-placeholder {
   position: relative;
   width: 100%;
@@ -294,7 +454,6 @@ body {
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
   overflow: hidden;
 }
-/* Vinyl sheen, clipped to the placeholder shape (never a square). */
 .sticker-placeholder::after {
   content: "";
   position: absolute;
@@ -335,145 +494,595 @@ body {
 }
 
 /* ------------------------------------------------------------------ */
-/* Card (section content)                                             */
+/* Sections (right column)                                            */
 /* ------------------------------------------------------------------ */
-.deck-card {
+.section {
+  scroll-margin-top: 4.5rem; /* clears the mobile sticky top bar */
+  padding: clamp(3rem, 7vh, 5rem) clamp(1.25rem, 4vw, 3.5rem);
+  border-top: 1px solid var(--line-soft);
+  outline: none;
+}
+/* No divider above the very first section (it sits at the top of the column). */
+.layout__right .section:first-of-type {
+  border-top: none;
+}
+/* The last section needs room to scroll up far enough to become active. */
+#contact.section {
+  padding-bottom: clamp(6rem, 30vh, 16rem);
+}
+.section-inner {
+  max-width: 720px;
+  margin: 0;
+}
+.section-head {
+  font-family: var(--font-display), sans-serif;
+  font-size: clamp(1.3rem, 3vw, 1.7rem);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  margin: 0 0 1.75rem;
+  color: #fff;
+}
+.section-head__mark {
+  color: var(--accent);
+  font-family: var(--font-mono), monospace;
+  font-weight: 500;
+  margin-right: 0.5rem;
+  opacity: 0.7;
+}
+
+.prose {
+  max-width: 65ch;
+  color: var(--fg);
+  margin: 0 0 1rem;
+}
+.prose:last-child {
+  margin-bottom: 0;
+}
+
+.currently {
+  margin: 1.25rem 0 0;
+  color: var(--muted);
+  max-width: 65ch;
+}
+.currently__k {
+  display: inline-block;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--accent);
+  margin-right: 0.6rem;
+}
+
+/* Key/value rows (work cards, case-study header) */
+.kv {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1.75rem;
+  margin: 0;
+}
+.kv > div {
+  display: flex;
+  gap: 0.6rem;
+}
+.kv dt {
+  color: var(--faint);
+  font-size: 0.78rem;
+}
+.kv dd {
+  margin: 0;
+  color: var(--fg);
+}
+
+/* Tag rows (stack / honors) */
+.tag-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.tag {
+  font-size: 0.72rem;
+  color: var(--muted);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 0.12rem 0.6rem;
+}
+
+/* ---- Selected Work ---- */
+.work-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.work-card {
+  padding: 1.5rem 0;
+  border-top: 1px solid var(--line-soft);
+}
+.work-card:first-child {
+  border-top: none;
+  padding-top: 0;
+}
+.work-card__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.25rem 1rem;
+}
+.work-card__title {
+  font-family: var(--font-display), sans-serif;
+  font-size: 1.15rem;
+  font-weight: 600;
+  margin: 0;
+  color: #fff;
+}
+.work-card__time {
+  font-size: 0.78rem;
+  color: var(--faint);
+}
+.work-card__summary {
+  margin: 0.4rem 0 0.9rem;
+  color: var(--muted);
+  max-width: 60ch;
+}
+.work-card .kv {
+  margin-bottom: 0.9rem;
+}
+.read-link {
+  display: inline-block;
+  margin-top: 1rem;
+  color: var(--accent);
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+.read-link:hover {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+/* ---- Experience / Education timeline ---- */
+.timeline {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.timeline-item {
+  position: relative;
+  padding: 0 0 1.75rem 1.5rem;
+  border-left: 1px solid var(--line);
+}
+.timeline-item:last-child {
+  padding-bottom: 0;
+}
+.timeline-item::before {
+  content: "";
+  position: absolute;
+  left: -4.5px;
+  top: 0.55rem;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+.timeline-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.1rem 1rem;
+}
+.timeline-roleline {
+  margin: 0;
+}
+.timeline-role {
+  color: #fff;
+  font-weight: 600;
+}
+.timeline-org {
+  color: var(--muted);
+}
+.timeline-dates {
+  color: var(--faint);
+  font-size: 0.78rem;
+  text-align: right;
+}
+.timeline-line {
+  margin: 0.4rem 0 0;
+  color: var(--muted);
+  max-width: 62ch;
+}
+.edu .tag-row {
+  margin-top: 0.9rem;
+}
+.edu-note {
+  margin: 0.9rem 0 0;
+  color: var(--faint);
+  font-size: 0.9rem;
+}
+
+/* ---- Contact ---- */
+.contact {
   display: flex;
   flex-direction: column;
-  overflow: hidden;
-  background: rgba(255, 255, 255, 0.97);
-  color: var(--color-ink);
-  border-radius: 14px;
-  box-shadow:
-    0 0 0 1px rgba(0, 0, 0, 0.08),
-    0 30px 60px -22px rgba(0, 0, 0, 0.7);
-  backdrop-filter: blur(20px);
+  gap: 1.25rem;
+  align-items: flex-start;
 }
-
-/* Docked beside the lid: same top & bottom as the lid; fills remaining width. */
-.deck-card--side {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: calc(100% + var(--gap));
-  width: var(--card-w);
-  animation: card-in 280ms cubic-bezier(0.22, 1, 0.36, 1) both;
-}
-
-/* Bottom sheet on narrow screens — over the lower part of the screen. */
-.deck-card--sheet {
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: min(66dvh, 560px);
-  border-radius: 18px 18px 0 0;
-  box-shadow:
-    0 0 0 1px rgba(0, 0, 0, 0.08),
-    0 -18px 50px -16px rgba(0, 0, 0, 0.6);
-  z-index: 60;
-  animation: sheet-in 300ms cubic-bezier(0.22, 1, 0.36, 1) both;
-}
-
-@keyframes card-in {
-  from {
-    opacity: 0;
-    transform: translateX(14px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-@keyframes sheet-in {
-  from {
-    transform: translateY(100%);
-  }
-  to {
-    transform: translateY(0);
-  }
-}
-
-.deck-card__bar {
-  display: flex;
-  flex: none;
+.copy-email {
+  display: inline-flex;
   align-items: center;
-  gap: 12px;
-  padding: 10px 12px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
-  background: linear-gradient(180deg, #f6f6f7, #e9eaec);
-  user-select: none;
+  gap: 0.75rem;
+  flex-wrap: wrap;
 }
-.deck-close {
-  display: grid;
-  flex: none;
-  place-items: center;
-  width: 14px;
-  height: 14px;
-  border-radius: 999px;
-  background: #ff5f57;
-  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.12);
-  color: rgba(0, 0, 0, 0.5);
-  font-size: 9px;
-  line-height: 1;
+.copy-email__addr {
+  font-family: var(--font-mono), monospace;
+  color: var(--fg);
+  text-decoration: none;
+  border-bottom: 1px solid var(--line);
 }
-.deck-close span {
-  opacity: 0;
-  transition: opacity 120ms ease;
+.copy-email__addr:hover {
+  border-color: var(--accent);
 }
-.deck-close:hover span,
-.deck-close:focus-visible span {
-  opacity: 1;
+.copy-email__btn {
+  font-family: var(--font-mono), monospace;
+  font-size: 0.72rem;
+  color: var(--muted);
+  background: transparent;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 0.15rem 0.6rem;
+  cursor: pointer;
 }
-.deck-close:focus-visible {
-  outline: 2px solid #3b82f6;
-  outline-offset: 2px;
+.copy-email__btn:hover {
+  color: var(--fg);
+  border-color: rgba(255, 255, 255, 0.3);
 }
-.deck-card__title {
-  flex: 1;
-  min-width: 0;
+.contact-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  list-style: none;
   margin: 0;
-  text-align: center;
-  font-size: 13px;
-  font-weight: 600;
-  color: rgba(0, 0, 0, 0.7);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  padding: 0;
 }
-.deck-card__spacer {
-  flex: none;
-  width: 14px;
+.contact-links a {
+  color: var(--muted);
+  text-decoration: none;
 }
-.deck-card__scroll {
-  flex: 1;
-  min-height: 0;
-}
-.deck-card__body {
-  animation: body-fade 220ms ease-out both;
-}
-@keyframes body-fade {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
+.contact-links a:hover {
+  color: var(--fg);
+  text-decoration: underline;
+  text-underline-offset: 4px;
 }
 
-/* Highlight a section anchor when opened from an interest sticker. */
-@keyframes anchor-flash {
-  0%,
-  100% {
-    background: transparent;
-  }
-  30% {
-    background: rgba(37, 99, 235, 0.14);
-  }
+/* ------------------------------------------------------------------ */
+/* Footer                                                             */
+/* ------------------------------------------------------------------ */
+.site-footer {
+  border-top: 1px solid var(--line-soft);
+  padding: 2rem clamp(1.25rem, 4vw, 3.5rem) 2.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+  margin: 0;
+  font-family: var(--font-mono), monospace;
+  font-size: 0.72rem;
+  color: var(--faint);
 }
-.anchor-flash {
-  animation: anchor-flash 1600ms ease-out 1;
-  border-radius: 0.5rem;
+/* On the case-study page the container already provides horizontal padding. */
+.cs-page .site-footer {
+  padding-inline: 0;
+}
+.site-footer p {
+  margin: 0;
+}
+.site-footer__commit {
+  color: var(--muted);
+}
+.site-footer__source {
+  color: var(--muted);
+  text-decoration: none;
+}
+.site-footer__source:hover {
+  color: var(--fg);
+}
+
+/* ------------------------------------------------------------------ */
+/* Reveal on scroll (progressive enhancement)                         */
+/* ------------------------------------------------------------------ */
+html.js .reveal {
+  opacity: 0;
+  transform: translateY(16px);
+  transition:
+    opacity 0.6s ease,
+    transform 0.6s ease;
+}
+html.js .reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+/* ------------------------------------------------------------------ */
+/* Diagram                                                            */
+/* ------------------------------------------------------------------ */
+.diagram {
+  margin: 0 0 1.5rem;
+}
+.diagram-scroll {
+  overflow-x: auto;
+  padding-bottom: 0.25rem;
+}
+.diagram-svg {
+  display: block;
+  width: 100%;
+  min-width: 680px;
+  height: auto;
+  color: var(--faint); /* drives edge/arrow color */
+}
+.diagram-node rect {
+  fill: var(--panel);
+  stroke: var(--line);
+  stroke-width: 1;
+}
+.diagram-node text {
+  fill: var(--fg);
+  font-family: var(--font-mono), monospace;
+  font-size: 17px;
+}
+.diagram-edge-label {
+  fill: var(--muted);
+  font-family: var(--font-mono), monospace;
+  font-size: 14px;
+}
+.diagram-caption {
+  margin-top: 0.85rem;
+  color: var(--muted);
+  font-size: 0.85rem;
+  max-width: 65ch;
+}
+
+/* ------------------------------------------------------------------ */
+/* Command palette                                                    */
+/* ------------------------------------------------------------------ */
+.cmdk-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 12vh 16px 16px;
+}
+.cmdk {
+  width: 100%;
+  max-width: 560px;
+  background: #0c0d10;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  box-shadow: 0 30px 80px -20px rgba(0, 0, 0, 0.85);
+  overflow: hidden;
+}
+.cmdk-input {
+  width: 100%;
+  box-sizing: border-box;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--line);
+  color: var(--fg);
+  font-family: var(--font-body), sans-serif;
+  font-size: 0.95rem;
+  padding: 14px 16px;
+  outline: none;
+}
+.cmdk-input::placeholder {
+  color: var(--faint);
+}
+.cmdk-list {
+  max-height: 50vh;
+  overflow-y: auto;
+  list-style: none;
+  margin: 0;
+  padding: 6px;
+}
+.cmdk-group {
+  font-family: var(--font-mono), monospace;
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--faint);
+  padding: 10px 10px 4px;
+}
+.cmdk-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  border: none;
+  color: var(--fg);
+  padding: 9px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+.cmdk-item.is-selected {
+  background: rgba(138, 180, 255, 0.14);
+}
+.cmdk-item__hint {
+  color: var(--faint);
+  font-family: var(--font-mono), monospace;
+  font-size: 0.72rem;
+  white-space: nowrap;
+}
+.cmdk-empty {
+  padding: 16px 10px;
+  color: var(--muted);
+}
+.cmdk-footer {
+  display: flex;
+  gap: 16px;
+  padding: 10px 16px;
+  border-top: 1px solid var(--line);
+  color: var(--faint);
+  font-family: var(--font-mono), monospace;
+  font-size: 0.65rem;
+}
+
+/* ------------------------------------------------------------------ */
+/* Case study page                                                    */
+/* ------------------------------------------------------------------ */
+.cs-page {
+  max-width: 820px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+.cs-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.5rem 0;
+}
+.cs-back {
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+.cs-back:hover {
+  color: var(--fg);
+}
+.cs {
+  padding-bottom: 2rem;
+}
+.cs-header {
+  padding: 1.5rem 0 2.5rem;
+  border-bottom: 1px solid var(--line-soft);
+}
+.cs-title {
+  font-family: var(--font-display), sans-serif;
+  font-size: clamp(1.8rem, 5vw, 2.6rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin: 0;
+  color: #fff;
+}
+.cs-summary {
+  margin: 0.75rem 0 1.5rem;
+  color: var(--muted);
+  font-size: 1.05rem;
+  max-width: 60ch;
+}
+.cs-kv {
+  margin-bottom: 1.25rem;
+}
+.cs-header .tag-row {
+  margin-bottom: 1.25rem;
+}
+.cs-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.25rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.cs-link {
+  color: var(--accent);
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+.cs-link:hover {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.cs-link.is-todo {
+  color: var(--faint);
+}
+
+.cs-block {
+  padding: 2.5rem 0;
+  border-bottom: 1px solid var(--line-soft);
+}
+.cs-block .section-head {
+  font-size: 1.25rem;
+  margin-bottom: 1.25rem;
+}
+
+.decisions {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+.decision {
+  padding-left: 1rem;
+  border-left: 2px solid var(--line);
+}
+.decision__choice {
+  margin: 0 0 0.6rem;
+  color: var(--fg);
+  font-weight: 600;
+  max-width: 65ch;
+}
+.decision__detail {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+.decision__detail > div {
+  display: flex;
+  gap: 0.75rem;
+}
+.decision__detail dt {
+  flex: none;
+  width: 3rem;
+  color: var(--faint);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding-top: 0.15rem;
+}
+.decision__detail dd {
+  margin: 0;
+  color: var(--muted);
+  max-width: 60ch;
+}
+
+.bullets {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+.bullets li {
+  position: relative;
+  padding-left: 1.2rem;
+  color: var(--muted);
+  max-width: 65ch;
+}
+.bullets li::before {
+  content: "–";
+  position: absolute;
+  left: 0;
+  color: var(--accent);
+}
+.todo-note {
+  color: var(--faint);
+}
+.cs-return {
+  display: inline-block;
+  margin-top: 2rem;
 }
 
 /* ------------------------------------------------------------------ */
@@ -484,17 +1093,23 @@ body {
     animation: none !important;
     transition: none !important;
   }
-  .desk-shift {
-    transition: none !important;
-  }
-  .deck-card--side,
-  .deck-card--sheet,
-  .deck-card__body,
-  .anchor-flash {
-    animation: none !important;
-  }
   .sticker:hover,
   .sticker:focus-visible {
     transform: scale(1.04);
+  }
+  html.js .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  .sticker-mini,
+  .sticker-tip {
+    transition: none !important;
+  }
+  .sticker.is-active {
+    transform: none;
+  }
+  .sticker-mini.is-active {
+    transform: none;
   }
 }
