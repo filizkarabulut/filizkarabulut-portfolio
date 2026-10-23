@@ -66,10 +66,8 @@ export default function RootLayout({ children, modal }: LayoutProps<"/">) {
             __html: `document.documentElement.classList.add('js');
 try{
   var h=document.documentElement;
-  // Theme: stored choice wins, else follow the OS preference; default dark.
-  var t=localStorage.getItem('theme');
-  if(t!=='light'&&t!=='dark'){t=matchMedia('(prefers-color-scheme: light)').matches?'light':'dark';}
-  if(t==='light')h.setAttribute('data-theme','light');
+  // Theme: default is dark; only switch to light if the user chose it.
+  if(localStorage.getItem('theme')==='light')h.setAttribute('data-theme','light');
 }catch(e){}
 try{
   var h=document.documentElement;
