@@ -5,6 +5,7 @@ import { Reveal } from "@/components/Reveal";
 import { CopyEmail } from "@/components/CopyEmail";
 import { CommandPalette } from "@/components/CommandPalette";
 import { ConsoleGreeting } from "@/components/ConsoleGreeting";
+import { Intro } from "@/components/Intro";
 import { SiteFooter } from "@/components/SiteFooter";
 import { stickerImages } from "@/lib/stickerImages";
 import {
@@ -49,6 +50,7 @@ export default function Home() {
 
   return (
     <main className="page">
+      <Intro />
       <Shell stickerSrc={stickerImages}>
         <Section id="about" title="About">
         <Reveal>

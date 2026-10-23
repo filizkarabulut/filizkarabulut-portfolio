@@ -56,10 +56,23 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${display.variable} ${body.variable} ${mono.variable} antialiased`}
     >
       <body>
-        {/* Mark that JS is on, before paint, so scroll-reveal never flashes. */}
+        {/* Runs before first paint. Marks that JS is on (so scroll-reveal never
+            flashes) and decides whether the intro animation should play — adding
+            `intro-play` pre-paint means the page starts black with no flash of
+            the real content. Intro plays once per tab (sessionStorage), never
+            with a URL hash or reduced-motion, and `?intro=1` forces a replay. */}
         <script
           dangerouslySetInnerHTML={{
-            __html: "document.documentElement.classList.add('js')",
+            __html: `document.documentElement.classList.add('js');
+try{
+  var h=document.documentElement;
+  var force=new URLSearchParams(location.search).get('intro')==='1';
+  var reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var hasHash=location.hash.length>1;
+  var seen=sessionStorage.getItem('introSeen');
+  if(!reduced&&(force||(!hasHash&&!seen)))h.classList.add('intro-play');
+  sessionStorage.setItem('introSeen','1');
+}catch(e){}`,
           }}
         />
         {children}

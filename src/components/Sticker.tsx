@@ -26,6 +26,8 @@ interface StickerProps {
   gs?: number;
   /** Stacking order among overlapping stickers. Lid only. */
   z?: number;
+  /** Stagger index for the intro pop-in (FK = 0). Lid only. */
+  ii?: number;
   /** Resolved art (path + intrinsic size) from the server-side scan of
    *  /public/stickers. Undefined → show the colored label placeholder. */
   image?: StickerImage;
@@ -44,6 +46,7 @@ export function Sticker({
   dy,
   gs,
   z,
+  ii,
   image,
   mini = false,
 }: StickerProps) {
@@ -63,6 +66,7 @@ export function Sticker({
         "--dy": dy ?? "0",
         ...(gs !== undefined ? { "--gs": gs } : {}),
         ...(z !== undefined ? { "--z": z } : {}),
+        ...(ii !== undefined ? { "--ii": ii } : {}),
         "--fill": sticker.color,
       } as React.CSSProperties);
 
