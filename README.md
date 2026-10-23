@@ -32,38 +32,39 @@ npm run lint
 
 ## Sticker images
 
-Put one file per sticker in `public/stickers/`. The filename must match the
-`image` path in `portfolio.ts`. **Any sticker whose file is missing renders as a
-labeled placeholder**, so you can add art one at a time.
+Put one file per sticker in `public/stickers/`, named by its **id** (the `id`
+field in `portfolio.ts`). **The extension doesn't matter** — `fk.svg`, `fk.png`,
+`fk.webp`, and `fk.jpg` are all found automatically, so you can just drop in or
+overwrite a file with no code change. **Any sticker whose file is missing renders
+as a labeled placeholder**, so you can add art one at a time.
 
-| File (`public/stickers/…`) | Sticker | Format | Min size |
+| File (any extension) | Sticker | Recommended | Min size |
 |---|---|---|---|
-| `fk.svg`         | `{ FK }` (centerpiece) | SVG or transparent PNG | 800×800 |
-| `amplify.svg`    | AMPLIFY        | SVG or transparent PNG | 600×600 |
-| `spiq.svg`       | SpIQ           | SVG or transparent PNG | 600×600 |
-| `vandyhacks.svg` | VandyHacks     | SVG or transparent PNG | 600×600 |
-| `vanderbilt.svg` | Vanderbilt     | SVG or transparent PNG | 600×600 |
-| `ai.svg`         | AI / neural net | SVG or transparent PNG | 500×500 |
-| `valiant.svg`    | Ask VALIANT    | SVG or transparent PNG | 500×500 |
-| `vuit.svg`       | VUIT / IT      | SVG or transparent PNG | 500×500 |
-| `git-commit.svg` | git commit tag | SVG or transparent PNG | 800×320 (wide) |
-| `github.svg`     | GitHub (link)  | SVG or transparent PNG | 500×500 |
-| `linkedin.svg`   | LinkedIn (link) | SVG or transparent PNG | 500×500 |
-| `violin.svg`     | Violin         | SVG or transparent PNG | 400×400 |
-| `hiking.svg`     | Hiking / mountains | SVG or transparent PNG | 400×400 |
-| `film.svg`       | Film           | SVG or transparent PNG | 400×400 |
+| `fk.*`         | `{ FK }` (centerpiece) | SVG or transparent PNG | 800×800 |
+| `amplify.*`    | AMPLIFY        | SVG or transparent PNG | 600×600 |
+| `spiq.*`       | SpIQ           | SVG or transparent PNG | 600×600 |
+| `vandyhacks.*` | VandyHacks     | SVG or transparent PNG | 600×600 |
+| `vanderbilt.*` | Vanderbilt     | SVG or transparent PNG | 600×600 |
+| `ai.*`         | AI / neural net | SVG or transparent PNG | 500×500 |
+| `valiant.*`    | Ask VALIANT    | SVG or transparent PNG | 500×500 |
+| `vuit.*`       | VUIT / IT      | SVG or transparent PNG | 500×500 |
+| `git-commit.*` | git commit tag | SVG or transparent PNG | 800×320 (wide) |
+| `violin.*`     | Violin         | SVG or transparent PNG | 400×400 |
+| `hiking.*`     | Hiking / mountains | SVG or transparent PNG | 400×400 |
+| `film.*`       | Film           | SVG or transparent PNG | 400×400 |
 
 Notes:
-- **Transparent background required.** The white "die-cut" outline, soft shadow,
-  and vinyl sheen are added in CSS around the transparent shape.
-- **SVG is preferred** (sharpest at any size). Transparent PNG at the size above
-  also works. Square art for circle/rounded stickers; the `git-commit` "tag"
-  sticker should be wide.
-- The **GitHub** and **LinkedIn** stickers are links — clicking them opens the
-  profile URL in a new tab (they show a small ↗ badge on hover/focus) rather
-  than opening a window.
-- To change a filename, size tier, shape, color, rotation, or position, edit the
-  matching entry in `portfolio.ts`.
+- **One file per id.** If both `fk.svg` and `fk.png` exist, `.svg` wins — delete
+  the one you don't want so the right logo shows.
+- **Transparent background recommended.** The white "die-cut" outline, soft
+  shadow, and vinyl sheen are added in CSS around the shape, so a shaped
+  (non-rectangular) transparent logo looks best; a solid rectangular image still
+  works, it just reads as a square sticker.
+- **SVG is sharpest** at any size; transparent PNG/WebP at the size above also
+  works. Square art for circle/rounded stickers; the `git-commit` "tag" sticker
+  should be wide (~2.6:1).
+- To change a sticker's id, size, shape, color, rotation, or position, edit the
+  matching entry in `portfolio.ts` (placement lives in `lidPlacement`).
 
 ## Résumé
 

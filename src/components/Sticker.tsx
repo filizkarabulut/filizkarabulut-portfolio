@@ -3,39 +3,66 @@
 import Image from "next/image";
 import { useState, type ReactNode } from "react";
 import type { Sticker as StickerData } from "@/data/portfolio";
+import type { StickerImage } from "@/lib/stickerImages";
 
 interface StickerProps {
   sticker: StickerData;
-  /** Stagger index for the slap-on animation (lid only). */
-  index: number;
   /** True when this sticker maps to the section currently in view. */
   active: boolean;
   onOpen: (sticker: StickerData) => void;
   /** Where this sticker leads, shown as a tooltip on hover/focus (lid only). */
   tip?: string;
+  /** Width of this sticker's slot (CSS value, e.g. "100%", "75%"). Lid only. */
+  width?: string;
+  /** Tilt in degrees. Lid only. */
+  rot?: number;
+  /** Optional visual nudge from the slot (CSS lengths, e.g. "7cqw" / "-4cqh").
+   *  The sticker stays in flow — its column layout is undisturbed — and only the
+   *  painted art shifts, so a few stickers can overlap without re-flowing the grid. */
+  dx?: string;
+  dy?: string;
+  /** Extra visual scale on top of the slot size (1 = none). Used to grow the
+   *  interests cluster as a group without changing the flex layout. */
+  gs?: number;
+  /** Stacking order among overlapping stickers. Lid only. */
+  z?: number;
+  /** Resolved art (path + intrinsic size) from the server-side scan of
+   *  /public/stickers. Undefined → show the colored label placeholder. */
+  image?: StickerImage;
   /** Compact chip variant used in the mobile sticky nav bar. */
   mini?: boolean;
 }
 
 export function Sticker({
   sticker,
-  index,
   active,
   onOpen,
   tip,
+  width,
+  rot = 0,
+  dx,
+  dy,
+  gs,
+  z,
+  image,
   mini = false,
 }: StickerProps) {
   const [imgFailed, setImgFailed] = useState(false);
-  const [imgLoaded, setImgLoaded] = useState(false);
-  const hasImage = Boolean(sticker.image);
+  const hasImage = Boolean(image) && !imgFailed;
 
-  // In the lid, placement comes from grid-template-areas (keyed by id). Mini
-  // chips flow in the nav bar instead, so they get no grid area or stagger.
+  // Lid stickers are flex items in their column: --w is the slot width (a % of
+  // the column) and --rot the tilt; --dx/--dy optionally nudge the painted art
+  // out of its slot (for the overlapping interests cluster). CSS sizes the image
+  // with height:auto. Mini chips flow in the nav bar with a fixed size.
   const style = mini
     ? ({ "--fill": sticker.color } as React.CSSProperties)
     : ({
-        gridArea: sticker.id,
-        "--delay": `${120 + index * 45}ms`,
+        "--w": width ?? "100%",
+        "--rot": `${rot}deg`,
+        "--dx": dx ?? "0",
+        "--dy": dy ?? "0",
+        ...(gs !== undefined ? { "--gs": gs } : {}),
+        ...(z !== undefined ? { "--z": z } : {}),
         "--fill": sticker.color,
       } as React.CSSProperties);
 
@@ -45,41 +72,35 @@ export function Sticker({
     mini ? "sticker-mini" : "sticker",
     `shape-${sticker.shape}`,
     active ? "is-active" : "is-dimmed",
-  ].join(" ");
+    !hasImage && !mini ? "sticker--no-image" : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
 
-  // The placeholder fills the cell and stays until a real image has actually
-  // loaded — so a missing/slow image never flashes a broken graphic.
+  // The image sits in flow so its `height: auto` drives the box at the art's own
+  // aspect ratio. The label placeholder shows only when there's no usable image
+  // (missing file or load error) — not gated on an onLoad event, which can be
+  // missed when a cached image finishes before React attaches the handler.
   const inner: ReactNode = (
     <>
-      {(!hasImage || imgFailed || !imgLoaded) && (
+      {hasImage && (
+        <Image
+          src={image!.src}
+          alt={sticker.ariaLabel}
+          width={image!.width}
+          height={image!.height}
+          className="sticker-img"
+          onError={() => setImgFailed(true)}
+          priority={!mini && sticker.size === "XL"}
+        />
+      )}
+      {!hasImage && (
         <span
           className={`sticker-placeholder shape-${sticker.shape}`}
           aria-hidden="true"
         >
           <span className="placeholder-label">{sticker.label}</span>
         </span>
-      )}
-      {hasImage && !imgFailed && (
-        <Image
-          src={sticker.image as string}
-          alt={sticker.ariaLabel}
-          width={400}
-          height={400}
-          className="sticker-img"
-          onLoad={() => setImgLoaded(true)}
-          onError={() => setImgFailed(true)}
-          priority={!mini && sticker.size === "XL"}
-          style={
-            imgLoaded
-              ? undefined
-              : {
-                  position: "absolute",
-                  inset: 0,
-                  opacity: 0,
-                  pointerEvents: "none",
-                }
-          }
-        />
       )}
       {tip && !mini && (
         <span className="sticker-tip" aria-hidden="true">

@@ -7,18 +7,23 @@
   --font-display: var(--font-display);
   --font-body: var(--font-body);
   --font-mono: var(--font-mono);
-  --color-canvas: #000000;
+  --color-canvas: #0c0c0e;
 }
 
 :root {
-  --bg: #000000;
-  --fg: #e8eaf0;
-  --muted: #9aa3af;
-  --faint: #6b7280;
-  --line: rgba(255, 255, 255, 0.12);
-  --line-soft: rgba(255, 255, 255, 0.07);
+  --bg: #0c0c0e; /* right column / page */
+  --bg-left: #111114; /* left column — a touch lighter so the halves read apart */
+  --fg: #e8e8ea;
+  --muted: #8a8a93;
+  --faint: #65656d;
+  --line: rgba(255, 255, 255, 0.1);
+  --line-soft: rgba(255, 255, 255, 0.06);
   --accent: #8ab4ff;
   --panel: rgba(255, 255, 255, 0.03);
+  --status: #34d399;
+
+  /* Subtle monochrome grain so large dark areas don't read as flat. */
+  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.038'/%3E%3C/svg%3E");
 }
 
 /* ------------------------------------------------------------------ */
@@ -80,7 +85,15 @@ a {
   display: block;
 }
 .layout__left {
-  padding: 2rem 1.25rem 1.5rem;
+  padding: 2.5rem 1.25rem 2rem;
+  background:
+    var(--grain),
+    var(--bg-left);
+}
+.layout__right {
+  background:
+    var(--grain),
+    var(--bg);
 }
 
 @media (min-width: 1024px) {
@@ -93,25 +106,25 @@ a {
     position: sticky;
     top: 0;
     height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    /* center the composed block, but fall back to top-align if it's taller than
+       the viewport so the name never gets cut off */
+    justify-content: safe center;
     overflow-x: clip; /* contain hover-scaled stickers without a scrollbar */
     overflow-y: auto; /* safety valve on short viewports */
-    padding: 2.25rem clamp(1.5rem, 2.5vw, 2.5rem) 2rem;
+    padding: 2rem clamp(1.5rem, 2.5vw, 2.5rem);
     border-right: 1px solid var(--line-soft);
   }
 }
 
-/* The left column's inner stack, aligned to the laptop's left/right edges.
-   Full width below 1024px (laptop at the top); fills the column on desktop. */
+/* The left column's inner stack — one composed block, aligned to the laptop's
+   left/right edges, with even spacing so nothing floats. */
 .sidebar {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 1.75rem;
   width: 100%;
-}
-@media (min-width: 1024px) {
-  .sidebar {
-    height: 100%;
-  }
 }
 
 .sidebar-id {
@@ -135,41 +148,32 @@ a {
   line-height: 1.5;
   color: var(--muted);
 }
-
-/* Stage holds the laptop. On desktop it grows to fill the space between the
-   identity and the actions, centering the laptop vertically. */
-.sidebar-stage {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-}
-@media (min-width: 1024px) {
-  .sidebar-stage {
-    flex: 1;
-    min-height: 0;
-  }
+.sidebar-intro {
+  margin: 0;
+  font-size: 0.92rem;
+  line-height: 1.55;
+  color: var(--fg);
 }
 
-/* Laptop wrapper — width-driven (as large as the column allows), its aspect
-   ratio sets the height. */
+/* Laptop wrapper — width-driven (as large as the column allows); its fixed
+   10/7 aspect ratio sets the height, so every sticker's %-based placement scales
+   with the board on resize and nothing needs repositioning. */
 .sidebar-lid {
-  --ratio: 1.4;
   position: relative;
   width: 100%;
-  aspect-ratio: var(--ratio);
+  aspect-ratio: 10 / 7;
 }
 
-/* ---- Left-column actions ---- */
+/* ---- Left-column actions (directly under the laptop) ---- */
 .sidebar-actions {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 1rem;
+  gap: 1.25rem;
   font-size: 0.9rem;
 }
 .sidebar-action {
-  color: rgba(255, 255, 255, 0.82);
+  color: rgba(255, 255, 255, 0.85);
   text-decoration: none;
   transition: color 140ms ease;
 }
@@ -177,6 +181,39 @@ a {
   color: #fff;
   text-decoration: underline;
   text-underline-offset: 4px;
+}
+.sidebar-social {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.85rem;
+  margin-left: auto; /* push the icons to the right edge of the row */
+}
+.sidebar-icon {
+  display: inline-flex;
+  color: var(--muted);
+  transition: color 140ms ease;
+}
+.sidebar-icon:hover {
+  color: var(--fg);
+}
+
+/* ---- Status line ---- */
+.sidebar-status {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0;
+  font-family: var(--font-mono), monospace;
+  font-size: 0.72rem;
+  color: var(--muted);
+}
+.sidebar-status__dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--status);
+  box-shadow: 0 0 7px 0 var(--status);
+  flex: none;
 }
 
 /* ---- Mobile sticky top bar — mini stickers ---- */
@@ -239,26 +276,40 @@ a {
   height: 100%;
   container-type: size;
   container-name: lid;
-  display: grid;
-  padding: 2cqmin;
-  gap: 1cqmin;
+  display: block;
+  padding: 0;
   border-radius: 3.4cqmin;
-  overflow: visible; /* let sticker tooltips escape the lid */
+  overflow: hidden; /* clip anything past the board edge — no bleed, no scrollbar */
+  /* Layered top-to-bottom: fine brushed grain, darker left/right sides, then
+     the base anodized-aluminum gradient (lighter top, darker toward the hinge). */
   background:
     repeating-linear-gradient(
       90deg,
-      rgba(255, 255, 255, 0.05) 0 1.5px,
-      rgba(0, 0, 0, 0.022) 1.5px 3px
+      rgba(255, 255, 255, 0.045) 0 1.5px,
+      rgba(0, 0, 0, 0.02) 1.5px 3px
     ),
-    linear-gradient(157deg, #eef1f4 0%, #dce0e5 40%, #c6cbd2 72%, #b6bbc3 100%);
-  border: 1px solid rgba(255, 255, 255, 0.35);
+    linear-gradient(
+      90deg,
+      rgba(0, 0, 0, 0.16) 0%,
+      rgba(0, 0, 0, 0) 11%,
+      rgba(0, 0, 0, 0) 89%,
+      rgba(0, 0, 0, 0.16) 100%
+    ),
+    linear-gradient(
+      180deg,
+      #eef0f3 0%,
+      #dfe2e7 34%,
+      #ccd0d7 70%,
+      #bdc1c9 100%
+    );
+  border: 1px solid rgba(255, 255, 255, 0.3);
   box-shadow:
-    inset 0 2px 1px rgba(255, 255, 255, 0.8),
-    inset 0 -3px 3px rgba(0, 0, 0, 0.14),
-    inset 3px 0 5px rgba(0, 0, 0, 0.07),
-    inset -3px 0 5px rgba(0, 0, 0, 0.07),
-    0 0 110px -14px rgba(205, 220, 242, 0.35),
-    0 38px 72px -26px rgba(0, 0, 0, 0.85);
+    inset 0 1.5px 0 rgba(255, 255, 255, 0.95),
+    /* bright highlighted top edge */ inset 0 -2px 3px rgba(0, 0, 0, 0.12),
+    inset 3px 0 6px rgba(0, 0, 0, 0.06),
+    inset -3px 0 6px rgba(0, 0, 0, 0.06),
+    0 8px 20px -10px rgba(0, 0, 0, 0.55),
+    /* close contact shadow */ 0 34px 60px -26px rgba(0, 0, 0, 0.8); /* soft drop */
 }
 .lid::before {
   content: "";
@@ -266,16 +317,79 @@ a {
   inset: 0;
   border-radius: inherit;
   pointer-events: none;
-  box-shadow: inset 0 0 6cqmin rgba(90, 100, 115, 0.12);
+  box-shadow: inset 0 0 6cqmin rgba(80, 88, 102, 0.1);
+  z-index: 1;
 }
-
+/* ------------------------------------------------------------------ */
+/* Jigsaw grid — three flex columns, no overlapping slots             */
+/* ------------------------------------------------------------------ */
+/* The grid fills the board with 3% padding; columns are ~24 / 41 / 24 % of the
+   board width (flex-grow ratios) with a ~2.5% gap between them. */
+.lid-grid {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  padding: 3%;
+  box-sizing: border-box;
+  display: flex;
+  gap: 2.5%;
+}
+.lid-col {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  gap: 2.5%; /* minimum; space-between spreads any leftover evenly */
+  min-width: 0;
+}
+.lid-col--left,
+.lid-col--right {
+  flex: 24 1 0;
+}
+.lid-col--center {
+  flex: 41 1 0;
+}
+/* FK is vertically centred in the space above the bottom row. */
+.lid-center-fk {
+  flex: 1 1 auto;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 0;
+}
+/* Violin + hiker share one row; film + git-commit share the bottom row. */
+.lid-pair,
+.lid-bottom-row {
+  width: 100%;
+  display: flex;
+  align-items: flex-end; /* sit on a common baseline */
+  gap: 2.5%;
+}
+.lid-pair {
+  justify-content: space-between;
+}
+.lid-bottom-row {
+  justify-content: flex-end; /* nudges the pair slightly right of FK's centre */
+  gap: 4%; /* ≈1.6% of board width between film and the pill (≥1.5% clearance) */
+}
 /* ------------------------------------------------------------------ */
 /* Stickers                                                           */
 /* ------------------------------------------------------------------ */
 .sticker {
+  /* A slot in the jigsaw grid: --w is this sticker's width as a % of its column
+     (height auto keeps the art's aspect ratio), --rot tilts it, and --s is a
+     hover/active scale that stays 1 at rest. Slots never overlap. */
+  flex: 0 0 auto;
+  width: var(--w, 100%);
+  height: auto;
   position: relative;
-  place-self: stretch;
-  display: block;
+  z-index: var(--z, auto);
+  transform: translate(var(--dx, 0), var(--dy, 0)) rotate(var(--rot, 0deg))
+    scale(var(--s, 1)) scale(var(--gs, 1));
+  transform-origin: center;
   min-width: 0;
   padding: 0;
   border: none;
@@ -286,9 +400,10 @@ a {
     opacity 200ms ease,
     filter 200ms ease;
   cursor: pointer;
-  animation: sticker-slap 320ms cubic-bezier(0.2, 0.9, 0.3, 1.4) both;
-  animation-delay: var(--delay, 0ms);
-  will-change: transform;
+}
+/* No image (missing file) → the label placeholder needs a box to fill. */
+.sticker--no-image {
+  aspect-ratio: 1;
 }
 
 /* Active-section highlighting — the stickers are the only navigation now, so
@@ -298,22 +413,30 @@ a {
 }
 .sticker.is-active {
   opacity: 1;
-  transform: translateY(-4px) scale(1.04);
-  z-index: 30;
+  --s: 1.05;
+  z-index: 90;
 }
-.sticker.is-active .sticker-placeholder,
-.sticker.is-active .sticker-img {
+.sticker.is-active .sticker-placeholder {
   box-shadow:
     0 0 0 2px rgba(255, 255, 255, 0.45),
     0 0 30px 0 rgba(138, 180, 255, 0.95);
 }
+/* Active glow hugs the artwork's silhouette (drop-shadow follows the alpha edge);
+   kept compact so it doesn't reach into a neighbouring slot. */
+.sticker.is-active .sticker-img {
+  filter:
+    drop-shadow(0 0 0.8cqmin rgba(138, 180, 255, 0.95))
+    drop-shadow(0 0 1.4cqmin rgba(138, 180, 255, 0.55))
+    drop-shadow(0 0.4cqmin 0.5cqmin rgba(0, 0, 0, 0.3));
+}
 
-/* Hover / focus always win over the active-lift, so pointer feedback is clear. */
+/* Hover / focus always win over the active-lift, so pointer feedback is clear.
+   FK keeps the top z-index; hover lifts others just below it. */
 .sticker:hover,
 .sticker:focus-visible {
   opacity: 1;
-  transform: scale(1.06);
-  z-index: 40;
+  --s: 1.06;
+  z-index: 95;
 }
 .sticker:focus-visible {
   outline: none;
@@ -427,19 +550,20 @@ a {
 
 .sticker-img {
   width: 100%;
-  height: 100%;
-  display: block;
+  height: auto; /* each trimmed image keeps its own aspect ratio */
   object-fit: contain;
-  filter:
-    drop-shadow(1px 0 0 #fff) drop-shadow(-1px 0 0 #fff)
-    drop-shadow(0 1px 0 #fff) drop-shadow(0 -1px 0 #fff)
-    drop-shadow(0 5px 5px rgba(0, 0, 0, 0.35));
+  display: block;
+  filter: drop-shadow(0 0.4cqmin 0.4cqmin rgba(0, 0, 0, 0.3));
+}
+/* Mini chips are a fixed square, so there the image is contained, not natural. */
+.sticker-mini .sticker-img {
+  height: 100%;
+  object-fit: contain;
 }
 
 .sticker-placeholder {
-  position: relative;
-  width: 100%;
-  height: 100%;
+  position: absolute;
+  inset: 0;
   display: grid;
   place-items: center;
   text-align: center;
@@ -481,18 +605,6 @@ a {
   word-break: break-word;
 }
 
-@keyframes sticker-slap {
-  0% {
-    transform: scale(1.28);
-  }
-  60% {
-    transform: scale(0.97);
-  }
-  100% {
-    transform: scale(1);
-  }
-}
-
 /* ------------------------------------------------------------------ */
 /* Sections (right column)                                            */
 /* ------------------------------------------------------------------ */
@@ -506,9 +618,10 @@ a {
 .layout__right .section:first-of-type {
   border-top: none;
 }
-/* The last section needs room to scroll up far enough to become active. */
+/* A little extra room under the last section so it can scroll up far enough to
+   become active, without leaving a big empty gap above the footer. */
 #contact.section {
-  padding-bottom: clamp(6rem, 30vh, 16rem);
+  padding-bottom: clamp(3rem, 8vh, 6rem);
 }
 .section-inner {
   max-width: 720px;
@@ -1090,12 +1203,11 @@ html.js .reveal.is-visible {
 /* ------------------------------------------------------------------ */
 @media (prefers-reduced-motion: reduce) {
   .sticker {
-    animation: none !important;
     transition: none !important;
   }
   .sticker:hover,
   .sticker:focus-visible {
-    transform: scale(1.04);
+    --s: 1.03;
   }
   html.js .reveal {
     opacity: 1;
@@ -1107,7 +1219,7 @@ html.js .reveal.is-visible {
     transition: none !important;
   }
   .sticker.is-active {
-    transform: none;
+    --s: 1;
   }
   .sticker-mini.is-active {
     transform: none;

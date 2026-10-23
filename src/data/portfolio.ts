@@ -15,12 +15,19 @@ export const siteName = "Filiz Karabulut";
 /** Tagline shown under the name in the left column. */
 export const tagline = "CS + Applied Math, minoring in Engineering Management";
 
+/** One-line intro under the tagline in the left column (keep it to a sentence). */
+export const intro =
+  "I build production generative AI end to end — from AWS infrastructure to the frontend.";
+
+/** Small status line in the left column, shown after a ● dot. */
+export const location = "Nashville, TN";
+
 /** Contact email, shown with a copy button in the Contact section. */
 export const contactEmail = "filiz.karabulut@vanderbilt.edu";
 
 /** Profile + file links. The one place to edit URLs. */
-export const githubUrl = "https://github.com/"; // TODO: your GitHub profile URL
-export const linkedinUrl = "https://www.linkedin.com/"; // TODO: your LinkedIn profile URL
+export const githubUrl = "https://github.com/filizkarabulut";
+export const linkedinUrl = "https://www.linkedin.com/in/filizkarabulut";
 export const resumeUrl = "/resume.pdf"; // TODO: add resume.pdf to /public/
 export const repoUrl = "https://github.com/"; // TODO: this repository's URL ("view source")
 
@@ -36,8 +43,9 @@ export interface NavSection {
 /** Order here = order of sections below the hero, and in the command palette. */
 export const navSections: NavSection[] = [
   { id: "about", label: "About" },
-  { id: "work", label: "Work" },
   { id: "experience", label: "Experience" },
+  { id: "projects", label: "Projects" },
+  { id: "leadership", label: "Leadership" },
   { id: "education", label: "Education" },
   { id: "play", label: "Off the clock" },
   { id: "contact", label: "Contact" },
@@ -49,10 +57,10 @@ export const navSections: NavSection[] = [
 
 export const about = {
   /** 2–3 sentences, read in a narrow column. */
-  lead: "TODO: 2–3 sentence intro — who you are, what you build, and what you care about. Keep it plain and specific.",
+  lead: "I'm a Computer Science and Applied Mathematics student at Vanderbilt who builds AI-powered software end to end — from AWS infrastructure to the frontend. Right now I'm an AI Research Engineer Intern on Amplify, Vanderbilt's open-source generative AI platform, where I ship tools and agents used across campus. I like turning ideas into practical products people actually use, and I co-lead VandyHacks on the side.",
   /** A small, easily-updated status line. */
   currently:
-    "AI Engineer Intern at Vanderbilt's AMPLIFY GenAI Innovation Center.",
+    "AI Research Engineer Intern at Vanderbilt's Amplify GenAI Innovation Center.",
 };
 
 /* ------------------------------------------------------------------ */
@@ -132,9 +140,9 @@ export const caseStudies: CaseStudy[] = [
     title: "AMPLIFY Collab",
     summary:
       "Real-time room intelligence: AI agents that listen, watch the whiteboard, and contribute ideas live.",
-    role: "AI Engineer Intern",
-    timeline: "TODO: start – end",
-    team: "AMPLIFY GenAI Innovation Center · TODO: team size",
+    role: "AI Research Engineer Intern",
+    timeline: "May 2026 – Present",
+    team: "AMPLIFY GenAI Innovation Center · 12-person dev team",
     stack: [
       "Python",
       "AWS Bedrock",
@@ -269,9 +277,9 @@ export const caseStudies: CaseStudy[] = [
     title: "Code Interpreter Migration",
     summary:
       "Replaced an OpenAI Assistants code interpreter with sandboxed Python on AWS AgentCore.",
-    role: "AI Engineer Intern",
-    timeline: "TODO: start – end",
-    team: "AMPLIFY GenAI Innovation Center · TODO: team size",
+    role: "AI Research Engineer Intern",
+    timeline: "May 2026 – Present",
+    team: "AMPLIFY GenAI Innovation Center · 12-person dev team",
     stack: ["Python", "AWS AgentCore", "Amazon DynamoDB", "Amazon S3"],
     links: [{ label: "Repo", href: "#", todo: true }],
     featured: true,
@@ -376,10 +384,10 @@ export const caseStudies: CaseStudy[] = [
     slug: "spiq",
     title: "SpIQ",
     summary: "AI communication coach — 1st Place & Hacker's Choice at HackMT 2026.",
-    role: "TODO: your role",
+    role: "Founder",
     timeline: "HackMT 2026",
     team: "OFSET",
-    stack: ["TODO: stack", "TODO: stack"],
+    stack: ["Python", "MediaPipe", "OpenCV", "Flask"],
     links: [
       { label: "Live demo", href: "#", todo: true },
       { label: "Devpost", href: "#", todo: true },
@@ -413,11 +421,12 @@ export const caseStudies: CaseStudy[] = [
   {
     slug: "ask-valiant",
     title: "Ask VALIANT",
-    summary: "AI research discovery. TODO: one-line summary.",
-    role: "TODO: your role",
-    timeline: "TODO: start – end",
-    team: "TODO: team",
-    stack: ["TODO: stack"],
+    summary:
+      "A multi-agent research assistant that routes industry questions to matching Vanderbilt AI faculty.",
+    role: "Sole developer",
+    timeline: "Nov 2025 – May 2026",
+    team: "Solo · Vanderbilt VALIANT Lab",
+    stack: ["Python", "Flask", "TinyDB", "bcrypt"],
     links: [{ label: "Repo", href: "#", todo: true }],
     featured: true,
     problem: [
@@ -453,33 +462,46 @@ export interface ExperienceEntry {
 
 export const experience: ExperienceEntry[] = [
   {
-    role: "AI Engineer Intern",
+    role: "AI Research Engineer Intern",
     org: "AMPLIFY GenAI Innovation Center",
-    dates: "TODO: dates",
+    dates: "May 2026 – Present",
     lines: [
-      "Build real-time, multimodal AI agents for meetings (Collab) and migrated the product's code interpreter to sandboxed Python on AWS AgentCore.",
+      "Ship generative-AI features end to end on Amplify, Vanderbilt's open-source LLM platform used by 10,000+ people across 40+ institutions.",
+      "Led the code-interpreter migration to sandboxed Python on AWS Bedrock AgentCore, built a real-time meeting agent, and rebuilt the AI Actions interface.",
     ],
   },
   {
-    role: "TODO: your title",
+    role: "IT Systems & Operations Assistant",
     org: "Vanderbilt University IT (VUIT)",
-    dates: "TODO: dates",
-    lines: ["TODO: 1–2 lines on what you do at VUIT."],
-  },
-  {
-    role: "President",
-    org: "VandyHacks",
-    dates: "TODO: dates",
+    dates: "Jan 2026 – May 2026",
     lines: [
-      "Lead Vanderbilt's student hackathon community.",
-      "TODO: scale — team size, event attendance, sponsors, or initiatives you started.",
+      "Automated timesheet, network-device, and classroom-record reconciliation with Python (pandas) and SQL, replacing manual CSV review.",
+      "Integrated TDX ticketing with Crestron Fusion monitoring and resolved 50+ classroom AV, network, and control-system issues.",
+    ],
+  },
+];
+
+/* ------------------------------------------------------------------ */
+/* Leadership (own section, same timeline shape as Experience)        */
+/* ------------------------------------------------------------------ */
+
+export const leadership: ExperienceEntry[] = [
+  {
+    role: "Co-President",
+    org: "VandyHacks",
+    dates: "Feb 2026 – Present",
+    lines: [
+      "Co-lead Vanderbilt's student-run hackathon and a 15-person executive board.",
+      "Run finance, sponsorship, vendors, and operations for 150+ attendees, and expanded programming with a Y Combinator event and an Oracle-partnered hackathon.",
     ],
   },
   {
     role: "Social Chair",
     org: "VUWiSE",
-    dates: "TODO: dates",
-    lines: ["TODO: 1–2 lines on what you organize for VUWiSE."],
+    dates: "Sep 2026 – Present",
+    lines: [
+      "Plan social and community events for VU-WiSE's network of 400+ women in science, engineering, and mathematics.",
+    ],
   },
 ];
 
@@ -494,7 +516,7 @@ export const education = {
   dates: "Expected May 2029",
   honors: ["VALIANT AI Scholar"],
   /** Optional extra line. */
-  note: "TODO: notable coursework, GPA, or other honors (optional).",
+  note: "GPA 3.96/4.00. Dean's List, Fall 2025 and Spring 2026.",
 };
 
 /* ------------------------------------------------------------------ */
@@ -514,48 +536,11 @@ export type SizeTier = "XL" | "L" | "M" | "S";
 /** Placeholder silhouette used when no image is available. */
 export type StickerShape = "circle" | "rounded" | "tag";
 
-/**
- * The lid is a CSS grid; stickers are packed collage-style by placing each one
- * into a named grid area. `areas` is one string per row — each token is a
- * sticker `id` or "." for an open cell. Edit these strings to repack the lid.
- */
-export interface LidLayout {
-  cols: number;
-  rows: number;
-  areas: string[];
-}
-
-export const lidLayout: { desktop: LidLayout; mobile: LidLayout } = {
-  desktop: {
-    cols: 8,
-    rows: 6,
-    areas: [
-      "violin  ai       ai         valiant     valiant   vuit      vuit      hiking",
-      "amplify amplify  fk         fk          fk        fk        vanderbilt vanderbilt",
-      "amplify amplify  fk         fk          fk        fk        vanderbilt vanderbilt",
-      "spiq    spiq     fk         fk          fk        fk        vandyhacks vandyhacks",
-      "spiq    spiq     fk         fk          fk        fk        vandyhacks vandyhacks",
-      "film    github   github     git-commit  git-commit linkedin linkedin  .",
-    ],
-  },
-  mobile: {
-    cols: 6,
-    rows: 8,
-    areas: [
-      "amplify amplify ai         ai         vanderbilt vanderbilt",
-      "amplify amplify git-commit git-commit vanderbilt vanderbilt",
-      "valiant fk      fk         fk         fk         vuit",
-      "valiant fk      fk         fk         fk         vuit",
-      "violin  fk      fk         fk         fk         film",
-      "hiking  fk      fk         fk         fk         .",
-      "spiq    spiq    github     github     vandyhacks vandyhacks",
-      "spiq    spiq    linkedin   linkedin   vandyhacks vandyhacks",
-    ],
-  },
-};
+/* The board layout is a no-overlap flex grid built in `Laptop.tsx` (three
+ * columns of slots); each sticker's column, width, and rotation live there. */
 
 export interface Sticker {
-  /** Stable id — also its grid-area name in `lidLayout`. */
+  /** Stable id — also the key the board grid uses to place this sticker. */
   id: string;
   label: string;
   ariaLabel: string;
@@ -569,12 +554,16 @@ export interface Sticker {
   href?: string;
 }
 
-// To use real sticker art: drop files in /public/stickers and add e.g.
-//   image: "/stickers/fk.svg"
-// to a sticker below. Until then the colored placeholders are shown.
+// Sticker art lives in /public/stickers and is matched to a sticker by its `id`
+// (see src/lib/stickerImages.ts, which scans the folder on the server). Drop in
+// a file named after the id in ANY format — fk.png, fk.svg, fk.webp, fk.jpg… —
+// and it's picked up on the next build/dev start, no code change needed. Keep
+// ONE file per id (if both fk.svg and fk.png exist, svg wins — delete the other).
+// Any sticker with no matching file shows its colored label placeholder instead.
 export const stickers: Sticker[] = [
   {
     id: "fk",
+    image: "/stickers/fk",
     label: "{ FK }",
     ariaLabel: "FK logo sticker — jump to About",
     size: "XL",
@@ -584,6 +573,7 @@ export const stickers: Sticker[] = [
   },
   {
     id: "amplify",
+    image: "/stickers/amplify",
     label: "AMPLIFY",
     ariaLabel: "AMPLIFY sticker — jump to Experience",
     size: "L",
@@ -593,24 +583,27 @@ export const stickers: Sticker[] = [
   },
   {
     id: "spiq",
+    image: "/stickers/spiq",
     label: "SpIQ",
-    ariaLabel: "SpIQ sticker — jump to Work",
+    ariaLabel: "SpIQ sticker — jump to Projects",
     size: "L",
     shape: "circle",
     color: "#0ea5e9",
-    opens: "work",
+    opens: "projects",
   },
   {
     id: "vandyhacks",
+    image: "/stickers/vandyhacks",
     label: "VandyHacks",
-    ariaLabel: "VandyHacks sticker — jump to Experience",
+    ariaLabel: "VandyHacks sticker — jump to Leadership",
     size: "L",
     shape: "rounded",
     color: "#f59e0b",
-    opens: "experience",
+    opens: "leadership",
   },
   {
     id: "vanderbilt",
+    image: "/stickers/vanderbilt",
     label: "Vanderbilt",
     ariaLabel: "Vanderbilt sticker — jump to Education",
     size: "L",
@@ -619,61 +612,28 @@ export const stickers: Sticker[] = [
     opens: "education",
   },
   {
-    id: "ai",
-    label: "AI",
-    ariaLabel: "Neural network sticker — jump to Work",
-    size: "M",
-    shape: "circle",
-    color: "#10b981",
-    opens: "work",
-  },
-  {
     id: "valiant",
+    image: "/stickers/valiant",
     label: "Ask VALIANT",
-    ariaLabel: "Ask VALIANT sticker — jump to Work",
+    ariaLabel: "Ask VALIANT sticker — jump to Projects",
     size: "M",
     shape: "rounded",
     color: "#6366f1",
-    opens: "work",
-  },
-  {
-    id: "vuit",
-    label: "VUIT",
-    ariaLabel: "IT sticker — jump to Experience",
-    size: "M",
-    shape: "rounded",
-    color: "#334155",
-    opens: "experience",
+    opens: "projects",
   },
   {
     id: "git-commit",
+    image: "/stickers/git-commit",
     label: 'git commit -m "build cool things"',
-    ariaLabel: "git commit sticker — jump to Work",
+    ariaLabel: "git commit sticker — jump to About",
     size: "M",
     shape: "tag",
     color: "#0f172a",
-    opens: "work",
-  },
-  {
-    id: "github",
-    label: "GitHub",
-    ariaLabel: "GitHub sticker — opens my GitHub profile in a new tab",
-    size: "M",
-    shape: "circle",
-    color: "#24292f",
-    href: githubUrl,
-  },
-  {
-    id: "linkedin",
-    label: "LinkedIn",
-    ariaLabel: "LinkedIn sticker — opens my LinkedIn profile in a new tab",
-    size: "M",
-    shape: "rounded",
-    color: "#0a66c2",
-    href: linkedinUrl,
+    opens: "about",
   },
   {
     id: "violin",
+    image: "/stickers/violin",
     label: "Violin",
     ariaLabel: "Violin sticker — jump to Off the clock",
     size: "S",
@@ -683,6 +643,7 @@ export const stickers: Sticker[] = [
   },
   {
     id: "hiking",
+    image: "/stickers/hiking",
     label: "Hiking",
     ariaLabel: "Mountain sticker — jump to Off the clock",
     size: "S",
@@ -692,6 +653,7 @@ export const stickers: Sticker[] = [
   },
   {
     id: "film",
+    image: "/stickers/film",
     label: "Film",
     ariaLabel: "Film strip sticker — jump to Off the clock",
     size: "S",
@@ -710,3 +672,12 @@ export const caseStudyBySlug = (slug: string): CaseStudy | undefined =>
 
 export const featuredCaseStudies = (): CaseStudy[] =>
   caseStudies.filter((c) => c.featured);
+
+/** Slugs shown, in order, in the home-page "Projects" section. */
+export const projectSlugs = ["spiq", "ask-valiant"] as const;
+
+/** The case studies featured in the "Projects" section. */
+export const projects = (): CaseStudy[] =>
+  projectSlugs
+    .map((slug) => caseStudyBySlug(slug))
+    .filter((c): c is CaseStudy => Boolean(c));

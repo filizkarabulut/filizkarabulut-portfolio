@@ -1,18 +1,19 @@
 "use client";
 
 import {
-  lidLayout,
   navSections,
   stickers,
   type Sticker as StickerData,
 } from "@/data/portfolio";
+import type { StickerImage } from "@/lib/stickerImages";
 import { Sticker } from "./Sticker";
 
 interface LaptopProps {
-  isMobile: boolean;
   /** The section currently in view — the matching sticker(s) light up. */
   activeSection: string;
   onOpen: (sticker: StickerData) => void;
+  /** Resolved sticker art (id → path + size), from the server-side folder scan. */
+  stickerSrc: Record<string, StickerImage>;
 }
 
 /** section id -> human label, for the per-sticker tooltip. */
@@ -28,33 +29,71 @@ function tipFor(sticker: StickerData): string | undefined {
   return undefined;
 }
 
+const BY_ID = new Map(stickers.map((s) => [s.id, s]));
+
 /**
- * The laptop lid — a sticker collage that fills its wrapper and is the site's
- * only navigation. Each sticker is a shortcut to a section; the sticker(s) for
- * the active section light up while the rest dim.
+ * The laptop lid — a no-overlap, jigsaw-style grid of three flex columns. Each
+ * sticker gets its own slot (width is a % of its column, height auto), so slots
+ * never overlap. Stickers are the site's only navigation.
  */
-export function Laptop({ isMobile, activeSection, onOpen }: LaptopProps) {
-  const layout = isMobile ? lidLayout.mobile : lidLayout.desktop;
+export function Laptop({ activeSection, onOpen, stickerSrc }: LaptopProps) {
+  const slot = (
+    id: string,
+    width: string,
+    rot: number,
+    extra?: { dx?: string; dy?: string; gs?: number; z?: number },
+  ) => {
+    const sticker = BY_ID.get(id);
+    if (!sticker) return null;
+    return (
+      <Sticker
+        sticker={sticker}
+        width={width}
+        rot={rot}
+        dx={extra?.dx}
+        dy={extra?.dy}
+        gs={extra?.gs}
+        z={extra?.z}
+        image={stickerSrc[id]}
+        active={sticker.opens === activeSection}
+        tip={tipFor(sticker)}
+        onOpen={onOpen}
+      />
+    );
+  };
 
   return (
-    <div
-      className="lid"
-      style={{
-        gridTemplateColumns: `repeat(${layout.cols}, 1fr)`,
-        gridTemplateRows: `repeat(${layout.rows}, 1fr)`,
-        gridTemplateAreas: layout.areas.map((row) => `"${row}"`).join(" "),
-      }}
-    >
-      {stickers.map((sticker, i) => (
-        <Sticker
-          key={sticker.id}
-          sticker={sticker}
-          index={i}
-          active={sticker.opens === activeSection}
-          tip={tipFor(sticker)}
-          onOpen={onOpen}
-        />
-      ))}
+    <div className="lid">
+      <div className="lid-grid">
+        {/* Left column */}
+        <div className="lid-col lid-col--left">
+          {slot("amplify", "100%", -6)}
+          {slot("valiant", "75%", 6)}
+          {/* Violin + hiker + film strip form one tight overlapping row, scaled
+              up ~15% as a group and shifted left; violin in front, then hiker,
+              then film. Translates keep them in flow so no column re-flows. */}
+          <div className="lid-pair">
+            {slot("violin", "44%", 0, { dx: "5.73cqw", gs: 1.15, z: 5 })}
+            {slot("hiking", "48%", 2, { dx: "0cqw", gs: 1.15, z: 4 })}
+          </div>
+        </div>
+
+        {/* Center column */}
+        <div className="lid-col lid-col--center">
+          <div className="lid-center-fk">{slot("fk", "100%", -3)}</div>
+          <div className="lid-bottom-row">
+            {slot("film", "35%", -6, { dx: "-4.22cqw", gs: 1.15, z: 3 })}
+            {slot("git-commit", "60%", 2, { dy: "-10.5cqh" })}
+          </div>
+        </div>
+
+        {/* Right column */}
+        <div className="lid-col lid-col--right">
+          {slot("vandyhacks", "100%", 3)}
+          {slot("spiq", "100%", 0)}
+          {slot("vanderbilt", "80%", 3)}
+        </div>
+      </div>
     </div>
   );
 }

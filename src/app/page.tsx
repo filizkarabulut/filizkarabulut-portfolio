@@ -6,11 +6,13 @@ import { CopyEmail } from "@/components/CopyEmail";
 import { CommandPalette } from "@/components/CommandPalette";
 import { ConsoleGreeting } from "@/components/ConsoleGreeting";
 import { SiteFooter } from "@/components/SiteFooter";
+import { stickerImages } from "@/lib/stickerImages";
 import {
   about,
   education,
   experience,
-  featuredCaseStudies,
+  leadership,
+  projects,
   githubUrl,
   linkedinUrl,
   offTheClock,
@@ -43,11 +45,11 @@ function Section({
 }
 
 export default function Home() {
-  const work = featuredCaseStudies();
+  const projectList = projects();
 
   return (
     <main className="page">
-      <Shell>
+      <Shell stickerSrc={stickerImages}>
         <Section id="about" title="About">
         <Reveal>
           <p className="prose">{about.lead}</p>
@@ -58,10 +60,33 @@ export default function Home() {
         </Reveal>
       </Section>
 
-      <Section id="work" title="Work">
+      <Section id="experience" title="Experience">
+        <Reveal>
+          <ol className="timeline">
+            {experience.map((e, i) => (
+              <li key={i} className="timeline-item">
+                <div className="timeline-head">
+                  <p className="timeline-roleline">
+                    <span className="timeline-role">{e.role}</span>
+                    <span className="timeline-org"> · {e.org}</span>
+                  </p>
+                  <span className="timeline-dates mono">{e.dates}</span>
+                </div>
+                {e.lines.map((l, j) => (
+                  <p key={j} className="timeline-line">
+                    {l}
+                  </p>
+                ))}
+              </li>
+            ))}
+          </ol>
+        </Reveal>
+      </Section>
+
+      <Section id="projects" title="Projects">
         <Reveal>
           <ul className="work-list">
-            {work.map((c) => (
+            {projectList.map((c) => (
               <li key={c.slug} className="work-card">
                 <div className="work-card__head">
                   <h3 className="work-card__title">{c.title}</h3>
@@ -96,10 +121,10 @@ export default function Home() {
         </Reveal>
       </Section>
 
-      <Section id="experience" title="Experience">
+      <Section id="leadership" title="Leadership">
         <Reveal>
           <ol className="timeline">
-            {experience.map((e, i) => (
+            {leadership.map((e, i) => (
               <li key={i} className="timeline-item">
                 <div className="timeline-head">
                   <p className="timeline-roleline">
