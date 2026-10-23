@@ -17,7 +17,7 @@ export const tagline = "CS + Applied Math, minoring in Engineering Management";
 
 /** One-line intro under the tagline in the left column (keep it to a sentence). */
 export const intro =
-  "I build production generative AI end to end — from AWS infrastructure to the frontend.";
+  "I build production generative AI end to end — from AWS infrastructure to the JavaScript frontend.";
 
 /** Small status line in the left column, shown after a ● dot. */
 export const location = "Nashville, TN";
@@ -57,10 +57,10 @@ export const navSections: NavSection[] = [
 
 export const about = {
   /** 2–3 sentences, read in a narrow column. */
-  lead: "I'm a Computer Science and Applied Mathematics student at Vanderbilt who builds AI-powered software end to end — from AWS infrastructure to the frontend. Right now I'm an AI Research Engineer Intern on Amplify, Vanderbilt's open-source generative AI platform, where I ship tools and agents used across campus. I like turning ideas into practical products people actually use, and I co-lead VandyHacks on the side.",
+  lead: "I'm a Computer Science and Applied Mathematics student at Vanderbilt who ships production generative AI end to end — from AWS infrastructure to the JavaScript frontend. Right now I'm an AI Research Engineer Intern on Amplify, Vanderbilt's open-source AI platform used by 10,000+ people and piloted by 40+ institutions. I like turning ideas into products people actually use — I founded SpIQ (1st Place at HackMT 2026) and co-lead VandyHacks.",
   /** A small, easily-updated status line. */
   currently:
-    "AI Research Engineer Intern at Vanderbilt's Amplify GenAI Innovation Center.",
+    "AI Research Engineer Intern at AMPLIFY GenAI Innovation Center.",
 };
 
 /* ------------------------------------------------------------------ */
@@ -119,6 +119,9 @@ export interface CaseStudy {
   /** Monospace stack tags. */
   stack: string[];
   links?: CaseStudyLink[];
+  /** Optional screenshot/GIF shown under the summary (only when set). */
+  image?: string;
+  imageAlt?: string;
   /** Show on the home "Selected Work" list. */
   featured?: boolean;
 
@@ -385,38 +388,25 @@ export const caseStudies: CaseStudy[] = [
     title: "SpIQ",
     summary: "AI communication coach — 1st Place & Hacker's Choice at HackMT 2026.",
     role: "Founder",
-    timeline: "HackMT 2026",
-    team: "OFSET",
+    timeline: "Jan 2026",
+    team: "Team of 6",
     stack: ["Python", "MediaPipe", "OpenCV", "Flask"],
     links: [
-      { label: "Live demo", href: "#", todo: true },
-      { label: "Devpost", href: "#", todo: true },
-      { label: "Repo", href: "#", todo: true },
+      { label: "Repo", href: "https://github.com/devmutfak/devmutfak-repo" },
     ],
     featured: true,
     problem: [
-      "SpIQ is an AI communication coach, built with team OFSET at HackMT 2026, where it won 1st Place and Hacker's Choice.",
-      "TODO: What does SpIQ coach, for whom, and what problem does it solve? 2–3 sentences.",
+      "SpIQ is an AI communication coach, built with a team of 6 at HackMT 2026, where it won 1st Place and Hacker's Choice.",
+      "It gives real-time feedback on interview and presentation delivery from webcam video.",
     ],
     architecture: {
       explanation: [
-        "TODO: Describe how SpIQ works end to end — inputs, models, and how feedback is produced.",
+        "The computer-vision backend (Python, MediaPipe, OpenCV, Flask) tracks 9 behavioral signals — eye contact, gestures, blink rate, head stability, body sway, and more — over 15-second windows and reports them as JSON scores.",
       ],
     },
-    decisions: [
-      {
-        choice: "TODO: a key technical choice you made",
-        why: "TODO: why",
-        cost: "TODO: what it cost",
-      },
-    ],
-    challenges: [
-      "TODO: the hardest problem you solved during the hackathon.",
-    ],
-    results: [
-      "1st Place & Hacker's Choice, HackMT 2026.",
-      "TODO: what you'd build next if you kept going.",
-    ],
+    decisions: [],
+    challenges: [],
+    results: ["1st Place & Hacker's Choice at HackMT 2026."],
   },
   {
     slug: "ask-valiant",
@@ -427,23 +417,21 @@ export const caseStudies: CaseStudy[] = [
     timeline: "Nov 2025 – May 2026",
     team: "Solo · Vanderbilt VALIANT Lab",
     stack: ["Python", "Flask", "TinyDB", "bcrypt"],
-    links: [{ label: "Repo", href: "#", todo: true }],
+    links: [
+      { label: "Repo", href: "https://github.com/filizkarabulut/ask-valiant" },
+    ],
     featured: true,
     problem: [
-      "TODO: What is Ask VALIANT, who is it for, and what research-discovery problem does it solve?",
+      "Ask VALIANT is a multi-agent research assistant for Vanderbilt's VALIANT lab. It routes industry questions through router, research, and knowledge agents to match them with 134 AI faculty and their 6K+ PubMed papers.",
     ],
     architecture: {
-      explanation: ["TODO: Describe the architecture and how it works."],
+      explanation: [
+        "Shipped end to end in Flask: bcrypt session auth, TinyDB persistence, and an admin dashboard that flags failures across four severity levels — e.g., no faculty match or missing citation — and tracks satisfaction KPIs.",
+      ],
     },
-    decisions: [
-      {
-        choice: "TODO: a key technical choice",
-        why: "TODO: why",
-        cost: "TODO: what it cost",
-      },
-    ],
-    challenges: ["TODO: the hardest problem and how you solved it."],
-    results: ["TODO: outcomes and next steps."],
+    decisions: [],
+    challenges: [],
+    results: [],
   },
 ];
 
@@ -466,17 +454,17 @@ export const experience: ExperienceEntry[] = [
     org: "AMPLIFY GenAI Innovation Center",
     dates: "May 2026 – Present",
     lines: [
-      "Ship generative-AI features end to end on Amplify, Vanderbilt's open-source LLM platform used by 10,000+ people across 40+ institutions.",
-      "Led the code-interpreter migration to sandboxed Python on AWS Bedrock AgentCore, built a real-time meeting agent, and rebuilt the AI Actions interface.",
+      "Ship generative-AI features end to end on Amplify, Vanderbilt's open-source AI platform used by 10,000+ people and piloted by 40+ institutions.",
+      "Led Amplify's migration from the OpenAI Assistants API to sandboxed Python on AWS Bedrock AgentCore, built a real-time meeting agent, and rebuilt the AI Actions interface.",
     ],
   },
   {
     role: "IT Systems & Operations Assistant",
-    org: "Vanderbilt University IT (VUIT)",
+    org: "Vanderbilt University IT",
     dates: "Jan 2026 – May 2026",
     lines: [
-      "Automated timesheet, network-device, and classroom-record reconciliation with Python (pandas) and SQL, replacing manual CSV review.",
-      "Integrated TDX ticketing with Crestron Fusion monitoring and resolved 50+ classroom AV, network, and control-system issues.",
+      "Automated timesheet, network-device, and classroom-record reconciliation in Python (pandas) and SQL, replacing manual CSV review for operations reporting.",
+      "Integrated TDX ticketing with Crestron Fusion monitoring for campus-wide AV visibility, and resolved 50+ classroom AV, network, and control-system issues.",
     ],
   },
 ];
@@ -497,7 +485,7 @@ export const leadership: ExperienceEntry[] = [
   },
   {
     role: "Social Chair",
-    org: "VUWiSE",
+    org: "VU-WiSE",
     dates: "Sep 2026 – Present",
     lines: [
       "Plan social and community events for VU-WiSE's network of 400+ women in science, engineering, and mathematics.",

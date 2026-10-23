@@ -6,6 +6,7 @@ import { Sticker } from "./Sticker";
 import { useActiveSection } from "@/hooks/useActiveSection";
 import { goToSection } from "@/lib/nav";
 import type { StickerImage } from "@/lib/stickerImages";
+import { ThemeToggle } from "./ThemeToggle";
 import {
   githubUrl,
   intro,
@@ -134,6 +135,7 @@ export function Shell({
               >
                 <LinkedInIcon />
               </a>
+              <ThemeToggle />
             </span>
           </div>
 

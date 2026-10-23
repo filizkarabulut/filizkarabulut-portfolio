@@ -62,7 +62,7 @@ export function CommandPalette() {
       kind: "case",
       label: c.title,
       hint: "case study",
-      run: () => router.push(`/work/${c.slug}`),
+      run: () => router.push(`/projects/${c.slug}`),
     }));
     const actions: Item[] = [
       {

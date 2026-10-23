@@ -48,7 +48,7 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default function RootLayout({ children, modal }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
@@ -66,6 +66,13 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             __html: `document.documentElement.classList.add('js');
 try{
   var h=document.documentElement;
+  // Theme: stored choice wins, else follow the OS preference; default dark.
+  var t=localStorage.getItem('theme');
+  if(t!=='light'&&t!=='dark'){t=matchMedia('(prefers-color-scheme: light)').matches?'light':'dark';}
+  if(t==='light')h.setAttribute('data-theme','light');
+}catch(e){}
+try{
+  var h=document.documentElement;
   var force=new URLSearchParams(location.search).get('intro')==='1';
   var reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
   var hasHash=location.hash.length>1;
@@ -76,6 +83,7 @@ try{
           }}
         />
         {children}
+        {modal}
       </body>
     </html>
   );
