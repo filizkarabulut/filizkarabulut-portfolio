@@ -1,10 +1,9 @@
 "use client";
 
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef } from "react";
-import type { CaseStudy } from "@/data/portfolio";
-import { CaseStudyHeader } from "./CaseStudyHeader";
+import type { ProjectCard } from "@/data/portfolio";
+import { ProjectCardBody, ProjectOverview } from "./ProjectCardBody";
 
 const FOCUSABLE =
   'a[href],button:not([disabled]),input,textarea,select,[tabindex]:not([tabindex="-1"])';
@@ -16,7 +15,7 @@ const FOCUSABLE =
  * URL back to "/" and returns to the homepage at its previous scroll position.
  * Locks background scroll, traps focus, and restores focus to the opener.
  */
-export function ProjectModal({ study }: { study: CaseStudy }) {
+export function ProjectModal({ project }: { project: ProjectCard }) {
   const router = useRouter();
   const cardRef = useRef<HTMLDivElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
@@ -90,15 +89,15 @@ export function ProjectModal({ study }: { study: CaseStudy }) {
             <span className="finder-light finder-light--max" aria-hidden="true" />
           </div>
           <span id="finder-title" className="finder-title mono">
-            {study.slug}
+            {project.caseStudySlug}
           </span>
         </div>
         <div className="finder-body">
           <article className="cs cs--card">
-            <CaseStudyHeader study={study} />
-            <Link href={`/projects/${study.slug}`} className="read-link cs-open">
-              Open full case study <span aria-hidden="true">→</span>
-            </Link>
+            <div className="pj pj--detail">
+              <ProjectCardBody project={project} context="detail" />
+            </div>
+            <ProjectOverview overview={project.overview} />
           </article>
         </div>
       </div>

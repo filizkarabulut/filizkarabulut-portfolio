@@ -15,7 +15,13 @@ const nextConfig: NextConfig = {
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
     // Allow the cache-busting `?v=<mtime>` query on sticker URLs through the
     // optimizer (local images with a query are rejected by default).
-    localPatterns: [{ pathname: "/stickers/**", search: "" }, { pathname: "/stickers/**" }],
+    localPatterns: [
+      { pathname: "/stickers/**", search: "" },
+      { pathname: "/stickers/**" },
+      // Project card thumbnails (screenshots / demo stills).
+      { pathname: "/projects/**", search: "" },
+      { pathname: "/projects/**" },
+    ],
   },
 };
 

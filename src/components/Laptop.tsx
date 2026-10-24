@@ -74,8 +74,8 @@ export function Laptop({ activeSection, onOpen, stickerSrc }: LaptopProps) {
               up ~15% as a group and shifted left; violin in front, then hiker,
               then film. Translates keep them in flow so no column re-flows. */}
           <div className="lid-pair">
-            {slot("violin", "44%", 0, { dx: "5.73cqw", gs: 1.15, z: 5, ii: 8 })}
-            {slot("hiking", "48%", 2, { dx: "0cqw", gs: 1.15, z: 4, ii: 9 })}
+            {slot("hiking", "44%", 0, { dx: "5cqw", dy: "-4cqh", gs: 1.15, z: 5, ii: 8 })}
+            {slot("violin", "48%", 2, { dx: "0cqw", gs: 1.15, z: 4, ii: 9 })}
           </div>
         </div>
 
@@ -84,8 +84,8 @@ export function Laptop({ activeSection, onOpen, stickerSrc }: LaptopProps) {
           {/* FK pops in first (ii: 0). */}
           <div className="lid-center-fk">{slot("fk", "100%", -3, { ii: 0 })}</div>
           <div className="lid-bottom-row">
-            {slot("film", "35%", -6, { dx: "-4.22cqw", gs: 1.15, z: 3, ii: 7 })}
-            {slot("git-commit", "60%", 2, { dy: "-10.5cqh", ii: 6 })}
+            {slot("film", "35%", -6, { dx: "-7cqw", dy: "-1cqh", gs: 1.15, z: 3, ii: 7 })}
+            {slot("git-commit", "60%", 2, { dx: "-3cqw", dy: "-10.5cqh", ii: 6 })}
           </div>
         </div>
 

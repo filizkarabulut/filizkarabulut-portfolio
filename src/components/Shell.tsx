@@ -29,6 +29,25 @@ function GitHubIcon() {
   );
 }
 
+/** Map-pin location marker. */
+function LocationIcon() {
+  return (
+    <svg
+      viewBox="0 0 16 16"
+      width="13"
+      height="13"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      className="sidebar-status__pin"
+      aria-hidden="true"
+    >
+      <path d="M8 1.5c-2.5 0-4.5 2-4.5 4.5 0 3.2 4.5 8 4.5 8s4.5-4.8 4.5-8c0-2.5-2-4.5-4.5-4.5Z" />
+      <circle cx="8" cy="6" r="1.6" />
+    </svg>
+  );
+}
+
 /** LinkedIn mark. */
 function LinkedInIcon() {
   return (
@@ -83,8 +102,11 @@ export function Shell({
       <div className="layout__left">
         <div className="sidebar">
           <header className="sidebar-id">
-            <h1 className="sidebar-name">{siteName}</h1>
-            <p className="sidebar-tagline">{tagline}</p>
+            <div className="sidebar-id__text">
+              <h1 className="sidebar-name">{siteName}</h1>
+              <p className="sidebar-tagline">{tagline}</p>
+            </div>
+            <ThemeToggle />
           </header>
 
           <p className="sidebar-intro">{intro}</p>
@@ -135,12 +157,11 @@ export function Shell({
               >
                 <LinkedInIcon />
               </a>
-              <ThemeToggle />
             </span>
           </div>
 
           <p className="sidebar-status">
-            <span className="sidebar-status__dot" aria-hidden="true" />
+            <LocationIcon />
             {location}
           </p>
         </div>

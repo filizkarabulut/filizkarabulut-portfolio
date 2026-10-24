@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { ProjectModal } from "@/components/ProjectModal";
-import { caseStudyBySlug } from "@/data/portfolio";
+import { projectCardBySlug } from "@/data/portfolio";
 
 /**
  * Intercepts a soft navigation to /projects/[slug] (e.g. clicking a project on
@@ -13,7 +13,7 @@ export default async function ProjectModalPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const cs = caseStudyBySlug(slug);
-  if (!cs) notFound();
-  return <ProjectModal study={cs} />;
+  const project = projectCardBySlug(slug);
+  if (!project) notFound();
+  return <ProjectModal project={project} />;
 }

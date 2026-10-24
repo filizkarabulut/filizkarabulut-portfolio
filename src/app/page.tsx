@@ -4,8 +4,10 @@ import { Reveal } from "@/components/Reveal";
 import { CopyEmail } from "@/components/CopyEmail";
 import { CommandPalette } from "@/components/CommandPalette";
 import { ConsoleGreeting } from "@/components/ConsoleGreeting";
+import { ExperienceEntry } from "@/components/ExperienceEntry";
 import { Intro } from "@/components/Intro";
-import { ProjectsGrid } from "@/components/ProjectsGrid";
+import { ProjectEntry } from "@/components/ProjectEntry";
+import { Chip, Tag } from "@/components/primitives";
 import { SiteFooter } from "@/components/SiteFooter";
 import { StatText } from "@/components/StatText";
 import { stickerImages } from "@/lib/stickerImages";
@@ -14,7 +16,7 @@ import {
   education,
   experience,
   leadership,
-  projects,
+  projectCards,
   githubUrl,
   linkedinUrl,
   offTheClock,
@@ -47,8 +49,6 @@ function Section({
 }
 
 export default function Home() {
-  const projectList = projects();
-
   return (
     <main className="page">
       <Intro />
@@ -58,10 +58,6 @@ export default function Home() {
           <p className="prose">
             <StatText text={about.lead} />
           </p>
-          <p className="currently">
-            <span className="currently__k mono">Currently</span>
-            {about.currently}
-          </p>
         </Reveal>
       </Section>
 
@@ -69,20 +65,7 @@ export default function Home() {
         <Reveal>
           <ol className="timeline">
             {experience.map((e, i) => (
-              <li key={i} className="timeline-item">
-                <div className="timeline-head">
-                  <p className="timeline-roleline">
-                    <span className="timeline-role">{e.role}</span>
-                    <span className="timeline-org"> · {e.org}</span>
-                  </p>
-                  <span className="timeline-dates mono">{e.dates}</span>
-                </div>
-                {e.lines.map((l, j) => (
-                  <p key={j} className="timeline-line">
-                    <StatText text={l} />
-                  </p>
-                ))}
-              </li>
+              <ExperienceEntry key={i} entry={e} />
             ))}
           </ol>
         </Reveal>
@@ -90,7 +73,11 @@ export default function Home() {
 
       <Section id="projects" title="Projects">
         <Reveal>
-          <ProjectsGrid studies={projectList} />
+          <ul className="pj-list">
+            {projectCards.map((p) => (
+              <ProjectEntry key={p.name} project={p} />
+            ))}
+          </ul>
         </Reveal>
       </Section>
 
@@ -98,20 +85,7 @@ export default function Home() {
         <Reveal>
           <ol className="timeline">
             {leadership.map((e, i) => (
-              <li key={i} className="timeline-item">
-                <div className="timeline-head">
-                  <p className="timeline-roleline">
-                    <span className="timeline-role">{e.role}</span>
-                    <span className="timeline-org"> · {e.org}</span>
-                  </p>
-                  <span className="timeline-dates mono">{e.dates}</span>
-                </div>
-                {e.lines.map((l, j) => (
-                  <p key={j} className="timeline-line">
-                    <StatText text={l} />
-                  </p>
-                ))}
-              </li>
+              <ExperienceEntry key={i} entry={e} />
             ))}
           </ol>
         </Reveal>
@@ -127,15 +101,26 @@ export default function Home() {
               <span className="timeline-dates mono">{education.dates}</span>
             </div>
             <p className="timeline-line">{education.degree}</p>
-            <p className="timeline-line">{education.minor}</p>
-            <ul className="tag-row" aria-label="Honors">
-              {education.honors.map((h) => (
-                <li key={h} className="tag mono">
-                  {h}
-                </li>
-              ))}
-            </ul>
-            {education.note && <p className="edu-note">{education.note}</p>}
+            <p className="timeline-line edu-minor">{education.minor}</p>
+            {education.chips.length > 0 && (
+              <ul className="edu-chips" aria-label="Achievements">
+                {education.chips.map((c) => (
+                  <li key={c}>
+                    <Chip>{c}</Chip>
+                  </li>
+                ))}
+              </ul>
+            )}
+            {education.coursework.length > 0 && (
+              <div className="edu-coursework">
+                <span className="edu-coursework__label mono">Coursework</span>
+                <ul className="tag2-row" aria-label="Coursework">
+                  {education.coursework.map((c) => (
+                    <Tag key={c}>{c}</Tag>
+                  ))}
+                </ul>
+              </div>
+            )}
           </div>
         </Reveal>
       </Section>

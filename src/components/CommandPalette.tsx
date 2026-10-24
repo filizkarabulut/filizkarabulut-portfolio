@@ -4,11 +4,11 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { goToSection } from "@/lib/nav";
 import {
-  caseStudies,
   contactEmail,
   githubUrl,
   linkedinUrl,
   navSections,
+  projectCards,
   resumeUrl,
 } from "@/data/portfolio";
 
@@ -58,12 +58,14 @@ export function CommandPalette() {
       hint: "section",
       run: () => navigateSection(s.id),
     }));
-    const cases: Item[] = caseStudies.map((c) => ({
-      kind: "case",
-      label: c.title,
-      hint: "case study",
-      run: () => router.push(`/projects/${c.slug}`),
-    }));
+    const cases: Item[] = projectCards
+      .filter((p) => p.caseStudySlug)
+      .map((p) => ({
+        kind: "case",
+        label: p.name,
+        hint: "case study",
+        run: () => router.push(`/projects/${p.caseStudySlug}`),
+      }));
     const actions: Item[] = [
       {
         kind: "action",

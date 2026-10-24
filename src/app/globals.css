@@ -74,6 +74,7 @@
   --accent: #2563c9;
   --panel: rgba(0, 0, 0, 0.035);
   --status: #0f9d6b;
+  --chip-tint: 10%;
 
   /* Dark space-gray aluminium lid. */
   --lid-top: #43454a;
@@ -192,8 +193,15 @@ a {
 
 .sidebar-id {
   display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+.sidebar-id__text {
+  display: flex;
   flex-direction: column;
   gap: 0.5rem;
+  min-width: 0;
 }
 .sidebar-name {
   margin: 0;
@@ -260,7 +268,7 @@ a {
 .sidebar-icon:hover {
   color: var(--text-primary);
 }
-/* Theme toggle — sits with the social icons; same muted-to-bright treatment. */
+/* Theme toggle — top-right of the identity header; muted-to-bright on hover. */
 .theme-toggle {
   display: inline-flex;
   align-items: center;
@@ -301,13 +309,10 @@ a {
   font-size: 0.8125rem; /* 13px */
   color: var(--text-meta);
 }
-.sidebar-status__dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: var(--status);
-  box-shadow: 0 0 7px 0 var(--status);
+.sidebar-status__pin {
   flex: none;
+  color: var(--text-meta);
+  transform: translateY(-0.5px);
 }
 
 /* ---- Mobile sticky top bar — mini stickers ---- */
@@ -761,21 +766,6 @@ a {
   margin-bottom: 0;
 }
 
-.currently {
-  margin: 1.25rem 0 0;
-  color: var(--text-meta);
-  max-width: 62ch;
-  line-height: 1.6;
-}
-.currently__k {
-  display: inline-block;
-  font-size: 0.8125rem; /* 13px */
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--accent);
-  margin-right: 0.6rem;
-}
-
 /* Key/value rows (work cards, case-study header) */
 .kv {
   display: flex;
@@ -879,24 +869,72 @@ a {
   margin: 0;
   padding: 0;
 }
-.timeline-item {
+
+/* ---- Shared chip / tag / divider (Experience + Projects) ---- */
+/* Chip — accent-tinted, accent text. Plain text, not a control. */
+.chip {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 6px;
+  /* Tint is lighter in light mode so accent text keeps >=4.5:1 contrast. */
+  background: color-mix(in srgb, var(--accent) var(--chip-tint, 16%), transparent);
+  color: var(--accent);
+  font-size: 0.8125rem; /* 13px */
+  font-weight: 500;
+  line-height: 1.45;
+  white-space: nowrap;
+}
+/* Tag — quiet monospace pill, hairline border in the stronger border token. */
+.tag2-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.tag2 {
+  padding: 2px 10px;
+  border: 0.5px solid var(--line);
+  border-radius: 999px;
+  color: var(--text-meta);
+  font-size: 0.8125rem; /* 13px */
+  line-height: 1.45;
+}
+/* Divider — hairline in the existing border token. */
+.hr {
+  height: 0;
+  border: none;
+  border-top: 1px solid var(--line);
+  margin: 0;
+}
+
+/* ---- Experience / Leadership entry ---- */
+/* Timeline line + dot per entry, aligned with the header; 32–40px between. */
+.xp {
   position: relative;
-  padding: 0 0 1.75rem 1.5rem;
+  padding: 0 0 2.25rem 1.5rem;
   border-left: 1px solid var(--line);
 }
-.timeline-item:last-child {
+.xp:last-child {
   padding-bottom: 0;
 }
-.timeline-item::before {
+/* Blue entry dot — larger than the item bullets, centred on the timeline line
+   and vertically on the role title. */
+.xp::before {
   content: "";
   position: absolute;
-  left: -4.5px;
-  top: 0.55rem;
-  width: 8px;
-  height: 8px;
+  left: -5.5px;
+  top: 0.8rem;
+  transform: translateY(-50%);
+  width: 11px;
+  height: 11px;
   border-radius: 50%;
   background: var(--accent);
 }
+
+/* Header row — shared with Education. */
+.xp-head,
 .timeline-head {
   display: flex;
   flex-wrap: wrap;
@@ -904,22 +942,102 @@ a {
   justify-content: space-between;
   gap: 0.1rem 1rem;
 }
+.xp-roleline,
 .timeline-roleline {
   margin: 0;
 }
+.xp-role,
 .timeline-role {
   color: var(--text-primary);
   font-weight: 600;
 }
+.xp-org,
 .timeline-org {
-  color: var(--text-strong);
+  color: var(--text-meta);
 }
+.xp-org__link {
+  color: inherit;
+  text-decoration: none;
+  transition: color 140ms ease;
+}
+.xp-org__link:hover {
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.xp-dates,
 .timeline-dates {
   color: var(--text-meta);
   font-family: var(--font-mono), monospace;
   font-size: 0.8125rem; /* 13px — the dimmest element in the entry */
   text-align: right;
 }
+
+/* Context line — muted org/work description + headline-number chips. */
+.xp-context {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0.5rem 0 0;
+}
+.xp-context__text {
+  color: var(--text-meta);
+  font-size: 0.9375rem; /* 15px */
+}
+.xp-context-tags {
+  margin-top: 0.6rem;
+}
+/* Item list — bullet + title + description + per-item tags. */
+.xp-items {
+  list-style: none;
+  margin: 0.9rem 0 0; /* space below the header / context line (no divider) */
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem; /* ~11px between bullet items */
+}
+.xp-item {
+  position: relative;
+  padding-left: 1rem;
+  font-size: 0.9375rem; /* 15px — so the bullet's em matches the first line */
+}
+/* Smaller than the blue entry dot, centred on the first line of text. */
+.xp-item::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.72em; /* ≈ centre of the 15px first line */
+  transform: translateY(-50%);
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--text-meta);
+}
+.xp-item__title {
+  margin: 0;
+  font-size: 0.9375rem; /* 15px */
+  font-weight: 500;
+  line-height: 1.4;
+  color: var(--text-primary);
+}
+.xp-item__desc {
+  margin: 0.375rem 0 0; /* 6px between title and description */
+  color: var(--text-body);
+  font-size: 0.9375rem; /* 15px */
+  line-height: 1.5;
+  max-width: 62ch;
+}
+/* Untitled items (IT, Leadership) lead with the description — drop the top
+   margin so its first line lines up with the bullet instead of sitting low. */
+.xp-item__desc:first-child {
+  margin-top: 0;
+}
+.xp-item .tag2-row {
+  margin-top: 0.5rem; /* 8px above an item's tags */
+}
+
+/* Education reuses the header/role styles above; its body lines: */
 .timeline-line {
   margin: 0.5rem 0 0;
   color: var(--text-body);
@@ -927,13 +1045,205 @@ a {
   line-height: 1.65;
   max-width: 62ch;
 }
-.edu .tag-row {
-  margin-top: 0.9rem;
+
+/* ---- Projects entry ---- */
+.pj-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
 }
-.edu-note {
-  margin: 0.9rem 0 0;
+.pj:not(:first-child) {
+  margin-top: 2.25rem; /* ~36px between projects (no divider line) */
+}
+/* List card: text column + a right-hand thumbnail / learn-more rail. */
+.pj-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 200px;
+  gap: 1.75rem 2rem;
+  align-items: start;
+}
+.pj-main {
+  min-width: 0;
+}
+.pj-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.1rem 1rem;
+}
+/* Title + its code link, grouped so the link sits right next to the name. */
+.pj-title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.1rem 0.75rem;
+  min-width: 0;
+}
+.pj-name {
+  margin: 0;
+  font-family: var(--font-display), sans-serif;
+  font-size: 1.0625rem; /* 17px */
+  font-weight: 500;
+  color: var(--text-primary);
+}
+.pj-codelink {
+  color: var(--accent);
+  text-decoration: none;
+  font-size: 0.8125rem; /* 13px */
+}
+.pj-codelink:hover {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.pj-dates {
   color: var(--text-meta);
-  font-size: 0.9rem;
+  font-family: var(--font-mono), monospace;
+  font-size: 0.8125rem; /* 13px */
+  text-align: right;
+}
+/* Role · team subtitle, directly under the name. */
+.pj-subtitle {
+  margin: 0.25rem 0 0; /* ~4px below the title row */
+  color: var(--text-meta);
+  font-size: 0.9375rem; /* 15px */
+}
+.pj-desc {
+  margin: 0.5rem 0 0; /* ~8px below the title/subtitle */
+  color: var(--text-body);
+  font-size: 1.0625rem; /* 17px */
+  line-height: 1.5;
+  max-width: 62ch; /* caps line length; avoids the single orphan word */
+  text-wrap: balance;
+}
+/* Highlights row — award chips + muted event label, on its own line. */
+.pj-highlights {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0.7rem 0 0; /* ~11px above the highlights row */
+}
+.pj-event {
+  color: var(--text-meta);
+  font-size: 0.9375rem; /* 15px */
+}
+.pj .tag2-row {
+  margin-top: 0.75rem; /* 12px before the tags */
+}
+/* Right rail: thumbnail (screenshot / short demo) + "Learn more →" beneath it. */
+.pj-aside {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+.pj-thumb {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  border-radius: 10px;
+  border: 1px solid var(--line-soft);
+  background: var(--panel);
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+}
+.pj-thumb__img {
+  object-fit: cover;
+}
+/* Placeholder label until a real screenshot/demo is dropped in. */
+.pj-thumb__ph {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: var(--text-meta);
+  font-family: var(--font-mono), monospace;
+  font-size: 0.75rem; /* 12px */
+  letter-spacing: 0.02em;
+}
+.pj-learn {
+  align-self: flex-start;
+  color: var(--accent);
+  text-decoration: none;
+  font-size: 0.875rem; /* 14px */
+}
+.pj-learn:hover {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+/* Overview section inside the popup / full page. */
+.pj-overview {
+  margin-top: 1.75rem;
+}
+.pj-overview .section-head {
+  font-size: 1.25rem;
+  margin-bottom: 1.25rem;
+}
+.pj--detail {
+  padding: 0;
+}
+
+/* Under ~640px: dates drop below the title; chips/tags already wrap. */
+@media (max-width: 640px) {
+  .xp-dates,
+  .timeline-dates,
+  .pj-dates {
+    width: 100%;
+    text-align: left;
+  }
+  /* Thumbnail rail stacks below the text instead of sitting beside it. */
+  .pj-grid {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+  .pj-aside {
+    max-width: 320px;
+  }
+}
+/* Three groups: school+degree, achievements, coursework. */
+/* Degree + minor read as one block: ~4px between the two lines. */
+.edu-minor {
+  margin-top: 0.25rem; /* 4px (overrides the 8px .timeline-line default) */
+}
+/* Achievement chips — accent-tinted, 16px below the minor line. */
+.edu-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  list-style: none;
+  margin: 1rem 0 0; /* 16px above */
+  padding: 0;
+}
+/* Coursework — label inline on the left, quiet tags wrapping to its right,
+   20px below the chips. */
+.edu-coursework {
+  display: flex;
+  align-items: baseline;
+  gap: 0 10px;
+  margin-top: 1.25rem; /* 20px above */
+}
+.edu-coursework__label {
+  flex: none;
+  color: var(--text-meta);
+  font-size: 0.8125rem; /* 13px — matches the Projects "Role" / "Built for" labels */
+}
+/* The tag row fills the space right of the label and wraps internally, so
+   wrapped lines align under the first tag rather than under the label. */
+.edu-coursework .tag2-row {
+  flex: 1 1 0;
+  min-width: 0;
+}
+/* Coursework tags: 13px with tighter padding than the chips (clearly quieter). */
+.edu-coursework .tag2 {
+  padding: 2px 8px;
+  white-space: nowrap;
+}
+/* Narrow screens: the label sits above the tags. */
+@media (max-width: 640px) {
+  .edu-coursework {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 6px;
+  }
 }
 
 /* ---- Contact ---- */
@@ -1390,6 +1700,7 @@ html.intro-play .layout__right {
 }
 html.intro-play .sidebar-name,
 html.intro-play .sidebar-tagline,
+html.intro-play .theme-toggle,
 html.intro-play .sidebar-intro,
 html.intro-play .sidebar-actions,
 html.intro-play .sidebar-status,
@@ -1490,6 +1801,9 @@ html.intro-run .sidebar-name {
   animation: intro-rise 0.5s 3s both;
 }
 html.intro-run .sidebar-tagline {
+  animation: intro-rise 0.5s 3.1s both;
+}
+html.intro-run .theme-toggle {
   animation: intro-rise 0.5s 3.1s both;
 }
 html.intro-run .sidebar-intro {

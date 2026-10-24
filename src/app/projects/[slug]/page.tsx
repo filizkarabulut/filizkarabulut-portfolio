@@ -5,8 +5,17 @@ import { CaseStudyArticle } from "@/components/CaseStudyArticle";
 import { CommandPalette } from "@/components/CommandPalette";
 import { ConsoleGreeting } from "@/components/ConsoleGreeting";
 import { PaletteButton } from "@/components/PaletteButton";
+import {
+  ProjectCardBody,
+  ProjectOverview,
+} from "@/components/ProjectCardBody";
 import { SiteFooter } from "@/components/SiteFooter";
-import { caseStudies, caseStudyBySlug, siteName } from "@/data/portfolio";
+import {
+  caseStudies,
+  caseStudyBySlug,
+  projectCardBySlug,
+  siteName,
+} from "@/data/portfolio";
 
 export const dynamicParams = false;
 
@@ -20,29 +29,35 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
+  const card = projectCardBySlug(slug);
   const cs = caseStudyBySlug(slug);
-  if (!cs) return {};
-  const title = `${cs.title} — ${siteName}`;
-  const description = cs.summary;
-  const url = `/projects/${cs.slug}`;
+  const name = card?.name ?? cs?.title;
+  if (!name) return {};
+  const description = card?.description ?? cs?.summary;
+  const url = `/projects/${slug}`;
   return {
-    title,
+    title: `${name} — ${siteName}`,
     description,
     alternates: { canonical: url },
-    openGraph: { title, description, url, type: "article", siteName },
-    twitter: { card: "summary_large_image", title, description },
+    openGraph: { title: `${name} — ${siteName}`, description, url, type: "article", siteName },
+    twitter: { card: "summary_large_image", title: `${name} — ${siteName}`, description },
   };
 }
 
-/** Full case study — shown on a direct visit or refresh of /projects/[slug]. */
+/**
+ * The project page — shown on a direct visit or refresh of /projects/[slug]
+ * (the popup's own URL). For featured projects it shows the same card body +
+ * Overview as the popup; other case studies fall back to the full article.
+ */
 export default async function ProjectPage({
   params,
 }: {
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const cs = caseStudyBySlug(slug);
-  if (!cs) notFound();
+  const card = projectCardBySlug(slug);
+  const cs = !card ? caseStudyBySlug(slug) : undefined;
+  if (!card && !cs) notFound();
 
   return (
     <main className="page cs-page">
@@ -54,7 +69,16 @@ export default async function ProjectPage({
       </div>
 
       <article className="cs">
-        <CaseStudyArticle study={cs} reveal />
+        {card ? (
+          <>
+            <div className="pj pj--detail">
+              <ProjectCardBody project={card} context="detail" />
+            </div>
+            <ProjectOverview overview={card.overview} />
+          </>
+        ) : (
+          <CaseStudyArticle study={cs!} reveal />
+        )}
 
         <Link href="/#projects" className="read-link cs-return">
           <span aria-hidden="true">←</span> Back to projects

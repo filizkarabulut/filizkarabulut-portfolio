@@ -13,23 +13,23 @@
 export const siteName = "Filiz Karabulut";
 
 /** Tagline shown under the name in the left column. */
-export const tagline = "CS + Applied Math, minoring in Engineering Management";
+export const tagline = "CS + Applied Math @ Vanderbilt University";
 
 /** One-line intro under the tagline in the left column (keep it to a sentence). */
 export const intro =
-  "I build production generative AI end to end — from AWS infrastructure to the JavaScript frontend.";
+  "SWE, AI, and a little bit of everything in between.";
 
 /** Small status line in the left column, shown after a ● dot. */
 export const location = "Nashville, TN";
 
 /** Contact email, shown with a copy button in the Contact section. */
-export const contactEmail = "filiz.karabulut@vanderbilt.edu";
+export const contactEmail = "filizkarabulutf@gmail.com";
 
 /** Profile + file links. The one place to edit URLs. */
 export const githubUrl = "https://github.com/filizkarabulut";
 export const linkedinUrl = "https://www.linkedin.com/in/filizkarabulut";
-export const resumeUrl = "/resume.pdf"; // TODO: add resume.pdf to /public/
-export const repoUrl = "https://github.com/"; // TODO: this repository's URL ("view source")
+export const resumeUrl = "/resume.pdf";
+export const repoUrl = "https://github.com/filizkarabulut/filizkarabulut-portfolio";
 
 /* ------------------------------------------------------------------ */
 /* Navigation sections (anchors on the home page)                     */
@@ -57,10 +57,7 @@ export const navSections: NavSection[] = [
 
 export const about = {
   /** 2–3 sentences, read in a narrow column. */
-  lead: "I'm a Computer Science and Applied Mathematics student at Vanderbilt who ships production generative AI end to end — from AWS infrastructure to the JavaScript frontend. Right now I'm an AI Research Engineer Intern on Amplify, Vanderbilt's open-source AI platform used by 10,000+ people and piloted by 40+ institutions. I like turning ideas into products people actually use — I founded SpIQ (1st Place at HackMT 2026) and co-lead VandyHacks.",
-  /** A small, easily-updated status line. */
-  currently:
-    "AI Research Engineer Intern at AMPLIFY GenAI Innovation Center.",
+  lead: "I'm a Computer Science and Applied Mathematics student at Vanderbilt University, interested in software engineering and AI/ML. I'm currently an AI Research Engineer Intern at Amplify, an open-source AI platform serving 10,000+ users and piloted by 40+ institutions. I also co-lead VandyHacks, Vanderbilt's student-run hackathon organization, which brings together 200+ participants annually.",
 };
 
 /* ------------------------------------------------------------------ */
@@ -143,7 +140,7 @@ export const caseStudies: CaseStudy[] = [
     title: "AMPLIFY Collab",
     summary:
       "Real-time room intelligence: AI agents that listen, watch the whiteboard, and contribute ideas live.",
-    role: "AI Research Engineer Intern",
+    role: "AI Engineer Intern",
     timeline: "May 2026 – Present",
     team: "AMPLIFY GenAI Innovation Center · 12-person dev team",
     stack: [
@@ -439,32 +436,83 @@ export const caseStudies: CaseStudy[] = [
 /* Experience (timeline)                                              */
 /* ------------------------------------------------------------------ */
 
+/** A numbered highlight (01 / Title + description) in an experience entry. */
+/** One bullet item in an experience entry. */
+export interface ExperienceItem {
+  /** Optional item title (primary text). Omit for untitled bullets (e.g. VUIT). */
+  title?: string;
+  /** Item description (secondary text). */
+  description?: string;
+  /** This item's own tech tags. */
+  tags?: string[];
+}
+
 export interface ExperienceEntry {
   role: string;
   org: string;
+  /** If set, the org name becomes a link opening in a new tab. */
+  orgHref?: string;
   /** Monospace, right-aligned. */
   dates: string;
-  /** 1–2 short lines. */
-  lines: string[];
+  /** Short muted description of the org/work (context line). */
+  context?: string;
+  /** Headline numbers shown as chips on the context line (unchanged wording). */
+  chips?: string[];
+  /** Entry-level tags under the context line — only for entries whose tags can't
+   *  be attributed to a specific item (fallback; prefer per-item `tags`). */
+  contextTags?: string[];
+  /** Bullet items. */
+  items: ExperienceItem[];
 }
 
 export const experience: ExperienceEntry[] = [
   {
     role: "AI Research Engineer Intern",
     org: "AMPLIFY GenAI Innovation Center",
+    orgHref: "https://www.amplifygenai.org/",
     dates: "May 2026 – Present",
-    lines: [
-      "Ship generative-AI features end to end on Amplify, Vanderbilt's open-source AI platform used by 10,000+ people and piloted by 40+ institutions.",
-      "Led Amplify's migration from the OpenAI Assistants API to sandboxed Python on AWS Bedrock AgentCore, built a real-time meeting agent, and rebuilt the AI Actions interface.",
+    items: [
+      {
+        title: "AgentCore Migration",
+        description:
+          "Migrated sandboxed AI code execution to AWS Bedrock AgentCore, building session management, multi-round tool execution, and persistent file handling.",
+        tags: ["AWS Bedrock AgentCore", "DynamoDB", "S3"],
+      },
+      {
+        title: "Multimodal Meeting Agent",
+        description:
+          "Built a real-time agent combining conversation context with OpenCV-based whiteboard change detection.",
+        tags: ["Amazon Nova Sonic", "OpenCV", "FastAPI", "Python"],
+      },
+      {
+        title: "AI Actions Frontend",
+        description:
+          "Rebuilt the interface for connecting AI assistants to external APIs.",
+        tags: ["JavaScript", "TypeScript"],
+      },
+      {
+        title: "Multi-Tenant Licensing",
+        description:
+          "Refactored a licensing plugin to support multiple institutions while resolving tenant-isolation and security issues.",
+        tags: ["TypeScript", "Node.js", "React", "OOXML"],
+      },
     ],
   },
   {
     role: "IT Systems & Operations Assistant",
     org: "Vanderbilt University IT",
     dates: "Jan 2026 – May 2026",
-    lines: [
-      "Automated timesheet, network-device, and classroom-record reconciliation in Python (pandas) and SQL, replacing manual CSV review for operations reporting.",
-      "Integrated TDX ticketing with Crestron Fusion monitoring for campus-wide AV visibility, and resolved 50+ classroom AV, network, and control-system issues.",
+    items: [
+      {
+        description:
+          "Automated timesheet, network-device, and classroom-record reconciliation in Python (pandas) and SQL, replacing manual CSV review for operations reporting.",
+        tags: ["Python", "pandas", "SQL"],
+      },
+      {
+        description:
+          "Integrated TDX ticketing with Crestron Fusion monitoring for campus-wide AV visibility, and resolved 50+ classroom AV, network, and control-system issues.",
+        tags: ["Crestron Fusion", "Python", "Microsoft SQL Server"],
+      },
     ],
   },
 ];
@@ -477,18 +525,28 @@ export const leadership: ExperienceEntry[] = [
   {
     role: "Co-President",
     org: "VandyHacks",
+    orgHref: "https://vandyhacks.org",
     dates: "Feb 2026 – Present",
-    lines: [
-      "Co-lead Vanderbilt's student-run hackathon and a 15-person executive board.",
-      "Run finance, sponsorship, vendors, and operations for 150+ attendees, and expanded programming with a Y Combinator event and an Oracle-partnered hackathon.",
+    items: [
+      {
+        description:
+          "Co-lead Vanderbilt's student-run hackathon and a 15-person executive board.",
+      },
+      {
+        description:
+          "Run finance, sponsorship, vendors, and operations for 150+ attendees, and expanded programming with a Y Combinator event and an Oracle-partnered hackathon.",
+      },
     ],
   },
   {
     role: "Social Chair",
     org: "VU-WiSE",
     dates: "Sep 2026 – Present",
-    lines: [
-      "Plan social and community events for VU-WiSE's network of 400+ women in science, engineering, and mathematics.",
+    items: [
+      {
+        description:
+          "Plan social and community events for VU-WiSE's network of 400+ women in science, engineering, and mathematics.",
+      },
     ],
   },
 ];
@@ -502,9 +560,17 @@ export const education = {
   degree: "B.S. Computer Science & Applied Mathematics",
   minor: "Minor in Engineering Management",
   dates: "Expected May 2029",
-  honors: ["VALIANT AI Scholar"],
-  /** Optional extra line. */
-  note: "GPA 3.96/4.00. Dean's List, Fall 2025 and Spring 2026.",
+  /** Achievements — rendered as accent-tinted chips (stand out from coursework). */
+  chips: ["GPA 3.96/4.00", "Dean's List: Fall 2025 & Spring 2026"],
+  /** Relevant coursework — rendered as quiet outline tags, in this order. */
+  coursework: [
+    "Data Structures",
+    "Algorithms",
+    "Data Science",
+    "Multivariable Calculus",
+    "Linear Algebra",
+    "Applied Behavioral Science",
+  ],
 };
 
 /* ------------------------------------------------------------------ */
@@ -669,3 +735,91 @@ export const projects = (): CaseStudy[] =>
   projectSlugs
     .map((slug) => caseStudyBySlug(slug))
     .filter((c): c is CaseStudy => Boolean(c));
+
+/* ------------------------------------------------------------------ */
+/* Projects — scannable card data (home "Projects" section)           */
+/* ------------------------------------------------------------------ */
+
+/** An external link shown as a text link (e.g. "Code ↗"). */
+export interface ProjectLink {
+  label: string;
+  href: string;
+}
+
+/** A label/value pair on the meta line (Role, Team, Built for…). */
+export interface ProjectMetaPair {
+  label: string;
+  value: string;
+}
+
+/** One project card. Any field may be omitted and renders cleanly. */
+export interface ProjectCard {
+  name: string;
+  /** Role · team, shown as a quiet subtitle under the name (e.g. "Co-Founder · Team of 6"). */
+  subtitle?: string;
+  /** Monospace, right-aligned. */
+  dates: string;
+  /** One-line description (body text). */
+  description: string;
+  /** Award/result labels shown as chips on the highlights row. */
+  awards?: string[];
+  /** Muted event label shown after the award chips (e.g. "HackMT 2026"). */
+  event?: string;
+  /** Legacy meta pairs. Prefer `subtitle`; kept optional for flexibility. */
+  meta?: ProjectMetaPair[];
+  /** Strongest/most-specific tags first (what's implied, like "Python", goes last). */
+  tags: string[];
+  /** External links (e.g. Code); shown next to the title, each opens in a new tab. */
+  links?: ProjectLink[];
+  /**
+   * Thumbnail shown on the card's right side (a screenshot or short demo loop).
+   * Path under /public (e.g. "/projects/spiq.png"); omit for a placeholder box.
+   */
+  thumbnail?: string;
+  thumbnailAlt?: string;
+  /** If set, "Learn more →" opens the project popup at /projects/<slug>. */
+  caseStudySlug?: string;
+  /** Résumé detail shown under an "Overview" heading inside the popup/full page. */
+  overview?: string[];
+}
+
+export const projectCards: ProjectCard[] = [
+  {
+    name: "SpIQ",
+    subtitle: "Co-Founder · 1st Place at HackMT 2026",
+    dates: "Jan 2026",
+    description:
+      "AI communication coach that gives real-time feedback on interview and presentation delivery from webcam video.",
+    tags: ["MediaPipe", "OpenCV", "Flask", "Python"],
+    links: [
+      { label: "Code", href: "https://github.com/devmutfak/devmutfak-repo" },
+    ],
+    // TODO: add a short SpIQ webcam-feedback screenshot/demo at /public/projects/spiq.*
+    caseStudySlug: "spiq",
+    overview: [
+      "Founded an AI communication coach that gives real-time feedback on interview and presentation delivery from webcam video.",
+      "Built the computer-vision backend (Python, MediaPipe, OpenCV, Flask) that tracks 9 behavioral signals (eye contact, gestures, blink rate, head stability, body sway etc.) over 15s windows as JSON scores.",
+    ],
+  },
+  {
+    name: "Ask VALIANT",
+    subtitle: "Sole developer · built for VALIANT lab",
+    dates: "Nov 2025 – May 2026",
+    description:
+      "Multi-agent research assistant that routes industry questions to matching Vanderbilt AI faculty.",
+    tags: ["Flask", "TinyDB", "bcrypt", "Python"],
+    links: [
+      { label: "Code", href: "https://github.com/filizkarabulut/ask-valiant" },
+    ],
+    // TODO: add a short Ask VALIANT chat screenshot/demo at /public/projects/ask-valiant.*
+    caseStudySlug: "ask-valiant",
+    overview: [
+      "Built a multi-agent research assistant for Vanderbilt's VALIANT lab that routes industry questions through router, research, and knowledge agents to match them with 134 AI faculty and their 6K+ PubMed papers.",
+      "Shipped the full stack in Flask: bcrypt session auth, TinyDB persistence, and an admin dashboard that flags failures across four severity levels (e.g., no faculty match, missing citation) and tracks satisfaction KPIs.",
+    ],
+  },
+];
+
+/** Look up a project card by its case-study slug. */
+export const projectCardBySlug = (slug: string): ProjectCard | undefined =>
+  projectCards.find((p) => p.caseStudySlug === slug);

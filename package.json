@@ -2,6 +2,8 @@
   "name": "filizkarabulut-portfolio",
   "version": "0.1.0",
   "private": true,
+  "description": "Filiz Karabulut's personal portfolio — an interactive sticker-covered laptop built with Next.js.",
+  "license": "MIT",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
