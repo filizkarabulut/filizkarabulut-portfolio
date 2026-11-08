@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import type { ProjectCard } from "@/data/portfolio";
 import { Chip, TagRow } from "./primitives";
+import { StatText } from "./StatText";
 
 /**
  * The shared body of a project card. The text content (title with its code
@@ -41,7 +42,11 @@ export function ProjectCardBody({
         <span className="pj-dates mono">{p.dates}</span>
       </div>
 
-      {p.subtitle && <p className="pj-subtitle">{p.subtitle}</p>}
+      {p.subtitle && (
+        <p className="pj-subtitle">
+          <StatText text={p.subtitle} emphasize={p.subtitleEmphasis} />
+        </p>
+      )}
 
       <p className="pj-desc">{p.description}</p>
 

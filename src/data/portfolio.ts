@@ -777,6 +777,8 @@ export interface ProjectCard {
   name: string;
   /** Role · team, shown as a quiet subtitle under the name (e.g. "Co-Founder · Team of 6"). */
   subtitle?: string;
+  /** Phrases in `subtitle` to emphasise (e.g. an award) — same wording, brighter. */
+  subtitleEmphasis?: string[];
   /** Monospace, right-aligned. */
   dates: string;
   /** One-line description (body text). */
@@ -806,11 +808,12 @@ export interface ProjectCard {
 export const projectCards: ProjectCard[] = [
   {
     name: "SpIQ",
-    subtitle: "Co-Founder · 1st Place at HackMT 2026",
+    subtitle: "Co-Founder · 1st Place & Hacker's Choice at HackMT 2026",
+    subtitleEmphasis: ["1st Place & Hacker's Choice"],
     dates: "Jan 2026",
     description:
-      "AI communication coach that gives real-time feedback on interview and presentation delivery from webcam video.",
-    tags: ["MediaPipe", "OpenCV", "Flask", "Python"],
+      "Built an AI-powered communication coach that analyzes visual cues to provide feedback on interview and presentation delivery.",
+    tags: ["Python", "MediaPipe", "OpenCV", "Flask", "OpenAI API"],
     links: [
       { label: "Code", href: "https://github.com/devmutfak/devmutfak-repo" },
     ],
@@ -823,11 +826,11 @@ export const projectCards: ProjectCard[] = [
   },
   {
     name: "Ask VALIANT",
-    subtitle: "Sole developer · built for VALIANT lab",
+    subtitle: "Sole Developer · Vanderbilt VALIANT Lab",
     dates: "Nov 2025 – May 2026",
     description:
-      "Multi-agent research assistant that routes industry questions to matching Vanderbilt AI faculty.",
-    tags: ["Flask", "TinyDB", "bcrypt", "Python"],
+      "Built a multi-agent research assistant that connects industry research needs with relevant Vanderbilt AI researchers and expertise.",
+    tags: ["Python", "Flask", "TinyDB", "Amplify API"],
     links: [
       { label: "Code", href: "https://github.com/filizkarabulut/ask-valiant" },
     ],
