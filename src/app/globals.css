@@ -2883,6 +2883,127 @@ html.intro-run .site-footer {
   margin: 0.3em 0;
 }
 
+/* ---- Clickable component boxes (open a detail panel) ---- */
+.arch-box--btn {
+  font-family: inherit;
+  cursor: pointer;
+  transition:
+    border-color 140ms ease,
+    background-color 140ms ease,
+    box-shadow 140ms ease;
+}
+.arch-box--btn:hover {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 10%, var(--panel));
+}
+.arch-box--btn.is-selected {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 16%, var(--panel));
+  box-shadow: 0 0 0 1px var(--accent);
+}
+.arch-box--btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* ---- Explore area under the diagram (bullets <-> detail panel, same slot) ----
+   A reserved min-height keeps the column (and the modal's scroll position) steady
+   when switching between the default bullets and a component's collapsed panel. */
+.av2-explore {
+  margin-top: 1rem;
+  min-height: 9.5rem;
+}
+.av2-hint {
+  margin: 0.75rem 0 0;
+  color: var(--faint);
+  font-size: 0.72rem; /* 11.5px */
+  line-height: 1.4;
+}
+.av2-detail {
+  border: 1px solid var(--line);
+  border-left: 2px solid var(--accent);
+  border-radius: 0 8px 8px 0;
+  background: var(--panel);
+  padding: 0.65rem 0.8rem 0.7rem;
+}
+.av2-detail:focus {
+  outline: none;
+}
+.av2-detail__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.3rem;
+}
+.av2-detail__title {
+  margin: 0;
+  font-family: var(--font-display), sans-serif;
+  font-size: 0.9375rem; /* 15px */
+  font-weight: 600;
+  color: var(--text-primary);
+}
+.av2-detail__close {
+  flex: none;
+  padding: 0.1rem 0.45rem;
+  background: transparent;
+  border: 1px solid var(--line-soft);
+  border-radius: 6px;
+  color: var(--text-meta);
+  font-size: 0.7rem; /* 11px */
+  cursor: pointer;
+  transition:
+    color 140ms ease,
+    border-color 140ms ease,
+    background-color 140ms ease;
+}
+.av2-detail__close:hover {
+  color: var(--text-primary);
+  border-color: var(--line);
+  background: var(--bg);
+}
+.av2-detail__summary {
+  margin: 0;
+  color: var(--text-body);
+  font-size: 0.875rem; /* 14px */
+  line-height: 1.5;
+}
+/* Subtle disclosure for deeper implementation detail. */
+.av2-detail__toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-top: 0.55rem;
+  padding: 0;
+  background: transparent;
+  border: none;
+  color: var(--accent);
+  font-size: 0.72rem; /* 11.5px */
+  cursor: pointer;
+  transition: color 140ms ease;
+}
+.av2-detail__toggle:hover {
+  color: var(--text-primary);
+}
+.av2-detail__toggle > span[aria-hidden] {
+  font-size: 0.65rem;
+}
+.av2-detail__more {
+  margin-top: 0.5rem;
+}
+.av2-detail__p {
+  margin: 0 0 0.5rem;
+  color: var(--text-body);
+  font-size: 0.8125rem; /* 13px */
+  line-height: 1.5;
+}
+.av2-detail__p:last-of-type {
+  margin-bottom: 0;
+}
+.av2-detail .code {
+  margin-top: 0.7rem;
+}
+
 /* ---- Card preview video (home Projects section) ---- */
 .pj-thumb__media {
   position: absolute;

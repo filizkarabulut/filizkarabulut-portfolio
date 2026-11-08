@@ -1,5 +1,5 @@
 import type { ProjectCard, ProjectCaseStudyData } from "@/data/portfolio";
-import { AskValiantArchitecture } from "./AskValiantArchitecture";
+import { AskValiantHowItWorks } from "./AskValiantHowItWorks";
 
 /** A numbered column heading: "01 / Demo". */
 function ColHead({ num, title }: { num: string; title: string }) {
@@ -97,14 +97,7 @@ export function AskValiantShowcase({
 
         <section className="av2-col av2-col--how">
           <ColHead num="02" title="How It Works" />
-          <AskValiantArchitecture />
-          {points.length > 0 && (
-            <ul className="bullets av2-points">
-              {points.map((p, i) => (
-                <li key={i}>{p}</li>
-              ))}
-            </ul>
-          )}
+          <AskValiantHowItWorks points={points} />
         </section>
       </div>
     </div>

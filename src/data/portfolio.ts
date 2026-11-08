@@ -1068,7 +1068,7 @@ const askValiant: ProjectCaseStudyData = {
     points: [
       "A router classifies intent, then routes to one of three assistants.",
       "3-tier faculty matching: keywords → research-area text → department fallback.",
-      "Amplify AI (GPT-4.1-mini) · Flask · TinyDB · live PubMed citations.",
+      "Amplify API · Flask · TinyDB · live PubMed citations.",
     ],
   },
   engineering: [

@@ -1,18 +1,59 @@
+"use client";
+
+import type { NodeId } from "./askValiantNodes";
+
+/** A clickable component box (button) with hover/selected highlight. */
+function Node({
+  id,
+  label,
+  sub,
+  accent,
+  selected,
+  onSelect,
+}: {
+  id: NodeId;
+  label: string;
+  sub?: string;
+  accent?: boolean;
+  selected: NodeId | null;
+  onSelect: (id: NodeId) => void;
+}) {
+  return (
+    <button
+      type="button"
+      className={`arch-box arch-box--btn${accent ? " arch-box--key" : ""}${
+        selected === id ? " is-selected" : ""
+      }`}
+      aria-pressed={selected === id}
+      onClick={() => onSelect(id)}
+    >
+      {label}
+      {sub && <small>{sub}</small>}
+    </button>
+  );
+}
+
 /**
  * Ask VALIANT's real multi-agent architecture, drawn as a compact vertical flow
  * so it fits in a column beside the demo video. Same pipeline as the horizontal
  * diagram — a user query is classified by the router, handled by one of three
  * assistants, with research questions running 3-tier faculty matching and a live
- * PubMed lookup, then a response is generated and logged. Sizing is em-relative
- * off the `.arch` font-size, so the enlarge view just scales that up.
+ * PubMed lookup, then a response is generated and logged.
+ *
+ * The router, the three assistants, and faculty matching are clickable (they open
+ * a detail panel); the remaining boxes are static. Sizing is em-relative off the
+ * `.arch` font-size, so an enlarged view would just scale that up.
  */
-export function AskValiantArchitecture() {
+export function AskValiantArchitecture({
+  selected,
+  onSelect,
+}: {
+  selected: NodeId | null;
+  onSelect: (id: NodeId) => void;
+}) {
+  const nodeProps = { selected, onSelect };
   return (
-    <div
-      className="arch"
-      role="img"
-      aria-label="Architecture: a user query is classified by a router and handled by one of three assistants (main, research, follow-up). Research questions run a 3-tier faculty-matching cascade and a live PubMed lookup, then a response is generated and logged to the database and admin dashboard."
-    >
+    <div className="arch">
       <div className="arch-row arch-row--1">
         <span className="arch-box">User query</span>
       </div>
@@ -20,36 +61,21 @@ export function AskValiantArchitecture() {
         ↓
       </span>
       <div className="arch-row arch-row--1">
-        <span className="arch-box arch-box--router">
-          Router
-          <small>classify intent</small>
-        </span>
+        <Node id="router" label="Router" sub="classify intent" accent {...nodeProps} />
       </div>
       <span className="arch-arrow" aria-hidden="true">
         ↓
       </span>
       <div className="arch-row arch-row--3">
-        <span className="arch-box">
-          Main
-          <small>info &amp; FAQs</small>
-        </span>
-        <span className="arch-box arch-box--key">
-          Research
-          <small>matching</small>
-        </span>
-        <span className="arch-box">
-          Follow-up
-          <small>context</small>
-        </span>
+        <Node id="main" label="Main" sub="info & FAQs" {...nodeProps} />
+        <Node id="research" label="Research" sub="matching" accent {...nodeProps} />
+        <Node id="followup" label="Follow-up" sub="context" {...nodeProps} />
       </div>
       <span className="arch-arrow" aria-hidden="true">
         ↓
       </span>
       <div className="arch-row arch-row--2">
-        <span className="arch-box">
-          Faculty matching
-          <small>3-tier cascade</small>
-        </span>
+        <Node id="matching" label="Faculty matching" sub="3-tier cascade" {...nodeProps} />
         <span className="arch-box">
           PubMed
           <small>live papers</small>
