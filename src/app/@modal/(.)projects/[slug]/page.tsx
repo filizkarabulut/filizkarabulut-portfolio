@@ -15,5 +15,5 @@ export default async function ProjectModalPage({
   const { slug } = await params;
   const project = projectCardBySlug(slug);
   if (!project) notFound();
-  return <ProjectModal project={project} />;
+  return <ProjectModal project={project} intercepted />;
 }

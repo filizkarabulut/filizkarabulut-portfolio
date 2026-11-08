@@ -1059,6 +1059,15 @@ a {
   line-height: 1.45;
 }
 
+/* Leadership drops the timeline line + dot (it reads as a short list of roles,
+   not a chronological track) and aligns flush-left like the Projects section. */
+#leadership .xp {
+  border-left: none;
+  padding-left: 0;
+}
+#leadership .xp::before {
+  display: none;
+}
 /* Leadership entries sit a touch further apart than Experience's so the two
    organizations read as distinct (scoped — Experience spacing is unchanged). */
 #leadership .xp:not(:last-child) {
@@ -2014,7 +2023,7 @@ html.intro-run .site-footer {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: clamp(0.75rem, 4vw, 3rem);
+  padding: clamp(0.5rem, 3vw, 2.5rem);
   background: rgba(0, 0, 0, 0.55);
   backdrop-filter: blur(6px);
   animation: finder-overlay-in 180ms ease both;
@@ -2043,6 +2052,34 @@ html.intro-run .site-footer {
     0 0 0 1px rgba(0, 0, 0, 0.4);
   transform-origin: center;
   animation: finder-in 220ms cubic-bezier(0.2, 0.8, 0.3, 1) both;
+}
+
+/* Larger window for the full case study — up to ~960px / 92vw, 90vh tall. */
+.finder--study {
+  width: min(960px, 92vw);
+  max-height: 90vh;
+}
+
+/* Extra-large window for the Ask VALIANT showcase (demo + architecture side by
+   side) — uses most of the screen with slim margins. */
+.finder-overlay--flush {
+  padding: clamp(0.5rem, 1.5vw, 1rem);
+}
+.finder--wide {
+  width: 95vw;
+  max-width: 95vw;
+  max-height: 92vh;
+}
+.finder--wide .finder-body {
+  padding: 0.5rem clamp(1rem, 2.5vw, 1.75rem) 1.25rem;
+}
+@media (max-width: 760px) {
+  .finder--wide {
+    width: 100%;
+    max-width: 100%;
+    max-height: 96vh;
+    border-radius: 10px;
+  }
 }
 @keyframes finder-in {
   from {
@@ -2107,12 +2144,46 @@ html.intro-run .site-footer {
   pointer-events: none;
 }
 
-/* Scrollable content. */
+/* Scrollable content. The title bar is flex:none above, so it stays fixed while
+   this region scrolls. A subtle dark scrollbar matches the theme. */
 .finder-body {
   flex: 1 1 auto;
   min-height: 0;
   overflow-y: auto;
+  overscroll-behavior: contain;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.18) transparent;
   padding: 0 clamp(1.25rem, 4vw, 2.5rem) 1.5rem;
+}
+.finder-body:focus {
+  outline: none;
+}
+.finder-body::-webkit-scrollbar {
+  width: 10px;
+}
+.finder-body::-webkit-scrollbar-track {
+  background: transparent;
+}
+.finder-body::-webkit-scrollbar-thumb {
+  background-clip: padding-box;
+  background-color: rgba(255, 255, 255, 0.16);
+  border: 2px solid transparent;
+  border-radius: 999px;
+}
+.finder-body::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(255, 255, 255, 0.28);
+}
+@media (prefers-reduced-motion: reduce) {
+  .finder-body {
+    scroll-behavior: auto;
+  }
+}
+/* The case-study body manages its own vertical rhythm (the header has top
+   padding), so the first section sits a touch below the title bar. */
+.finder--study .finder-body {
+  padding-top: 0.5rem;
 }
 .finder-body .cs {
   padding-bottom: 0.5rem;
@@ -2173,9 +2244,651 @@ html.intro-run .site-footer {
   margin-top: 0.5rem;
 }
 
+/* Mobile: the case-study window goes nearly full-screen with minimal margins,
+   keeping the macOS title bar and the scrollable body. */
+@media (max-width: 640px) {
+  .finder-overlay {
+    padding: 0.4rem;
+  }
+  .finder--study {
+    width: 100%;
+    max-height: 96vh;
+    border-radius: 10px;
+  }
+  .finder--study .finder-body {
+    padding-left: clamp(1rem, 4vw, 1.25rem);
+    padding-right: clamp(1rem, 4vw, 1.25rem);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .finder-overlay,
   .finder {
     animation: none;
   }
+}
+
+/* ------------------------------------------------------------------ */
+/* Project case study — the 01–05 body shown inside the macOS modal    */
+/* (SpIQ, Ask VALIANT). Reuses the site's tokens: dark canvas, blue    */
+/* accent, mono details. Horizontal padding comes from .finder-body.   */
+/* ------------------------------------------------------------------ */
+.av {
+  padding-bottom: 2rem;
+}
+
+/* ---- Header ---- */
+.av-header {
+  padding: 1rem 0 2.5rem;
+  border-bottom: 1px solid var(--line-soft);
+}
+.av-title {
+  margin: 0;
+  font-family: var(--font-display), sans-serif;
+  font-size: clamp(1.7rem, 4.5vw, 2.4rem);
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  line-height: 1.08;
+  color: var(--text-primary);
+}
+.av-subtitle {
+  margin: 0.85rem 0 0;
+  color: var(--text-strong);
+  font-size: 1.0625rem; /* 17px */
+}
+.av-dates {
+  margin: 0.3rem 0 0;
+  color: var(--text-meta);
+  font-size: 0.875rem; /* 14px */
+}
+.av-lead {
+  margin: 1.25rem 0 0;
+  max-width: 60ch;
+  color: var(--text-body);
+  font-size: 1.1875rem; /* 19px — a touch larger; it's the project's one-liner */
+  line-height: 1.6;
+}
+.av-tags {
+  margin-top: 1.5rem;
+}
+.av-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-top: 1.5rem;
+}
+.av-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-height: 42px;
+  padding: 0.45rem 1rem;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--text-primary);
+  text-decoration: none;
+  font-size: 0.9375rem; /* 15px */
+  transition:
+    border-color 140ms ease,
+    background-color 140ms ease;
+}
+.av-btn:hover {
+  border-color: var(--accent);
+  background: var(--panel);
+}
+
+/* ---- Numbered sections (01 / Demo …) ---- */
+.av-section {
+  padding: 2.75rem 0;
+  border-bottom: 1px solid var(--line-soft);
+}
+.av-section:last-of-type {
+  border-bottom: none;
+}
+.av-head {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  margin: 0 0 1.5rem;
+  font-family: var(--font-display), sans-serif;
+  font-size: clamp(1.3rem, 3vw, 1.6rem);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--text-primary);
+}
+.av-head__num {
+  color: var(--accent);
+  font-size: 0.9375rem; /* 15px */
+  font-weight: 500;
+}
+.av-head__sep {
+  color: var(--faint);
+  font-size: 0.9375rem; /* 15px */
+}
+
+/* ---- Prose + placeholder prompts ---- */
+.av-prose {
+  max-width: 64ch;
+  margin: 0 0 1rem;
+  color: var(--text-body);
+  font-size: 1.0625rem; /* 17px */
+  line-height: 1.7;
+}
+.av-prose:last-child {
+  margin-bottom: 0;
+}
+/* A visible, muted "still to write" placeholder line. */
+.av-todo {
+  max-width: 64ch;
+  margin: 0.75rem 0 0;
+  padding: 0.65rem 0.85rem;
+  color: var(--faint);
+  font-size: 0.8125rem; /* 13px */
+  line-height: 1.55;
+  background: var(--panel);
+  border-left: 2px solid var(--line);
+  border-radius: 0 6px 6px 0;
+}
+
+.av-subhead {
+  margin: 1.75rem 0 0.75rem;
+  font-family: var(--font-display), sans-serif;
+  font-size: 1.0625rem; /* 17px */
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* ---- Media: demo video + architecture diagram ---- */
+.av-media {
+  margin: 0 0 0.5rem;
+}
+.av-video {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  width: 100%;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  background: #000;
+}
+.av-video__el {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: contain;
+  background: #000;
+}
+.av-caption {
+  margin-top: 0.85rem;
+  max-width: 64ch;
+  color: var(--text-meta);
+  font-size: 0.9375rem; /* 15px */
+  line-height: 1.55;
+}
+
+/* Placeholder blocks (dashed, clearly labelled). */
+.av-ph {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  text-align: center;
+  padding: 1.5rem;
+  background: var(--panel);
+  border: 1px dashed var(--line);
+  border-radius: 12px;
+}
+.av-ph--video {
+  position: absolute;
+  inset: 0;
+}
+.av-ph--diagram {
+  min-height: clamp(180px, 34vw, 300px);
+}
+.ph-tag {
+  padding: 2px 9px;
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--accent) 16%, transparent);
+  color: var(--accent);
+  font-size: 0.6875rem; /* 11px */
+  font-weight: 600;
+  letter-spacing: 0.08em;
+}
+.ph-title {
+  margin: 0;
+  color: var(--text-body);
+  font-size: 1rem;
+}
+.ph-hint {
+  margin: 0;
+  color: var(--faint);
+  font-size: 0.8125rem; /* 13px */
+}
+/* Outlined play triangle for the demo placeholder. */
+.av-play {
+  display: inline-grid;
+  place-items: center;
+  width: 3rem;
+  height: 3rem;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+}
+.av-play::before {
+  content: "";
+  width: 0;
+  height: 0;
+  margin-left: 3px;
+  border-top: 9px solid transparent;
+  border-bottom: 9px solid transparent;
+  border-left: 14px solid var(--text-meta);
+}
+
+/* Diagram: click to enlarge. */
+.av-diagram-btn {
+  position: relative;
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--panel);
+  overflow: hidden;
+  cursor: zoom-in;
+  transition: border-color 140ms ease;
+}
+.av-diagram-btn:hover,
+.av-diagram-btn:focus-visible {
+  border-color: var(--accent);
+}
+.av-diagram-img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.av-enlarge {
+  position: absolute;
+  bottom: 0.6rem;
+  right: 0.6rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.25rem 0.6rem;
+  border-radius: 7px;
+  background: rgba(10, 10, 12, 0.72);
+  color: #f5f5f7;
+  font-size: 0.75rem; /* 12px */
+  opacity: 0;
+  transition: opacity 140ms ease;
+}
+.av-diagram-btn:hover .av-enlarge,
+.av-diagram-btn:focus-visible .av-enlarge {
+  opacity: 1;
+}
+.av-enlarge__icon {
+  font-size: 0.9rem;
+}
+
+/* Diagram lightbox. */
+.av-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 220;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(1rem, 4vw, 3rem);
+  background: rgba(0, 0, 0, 0.82);
+  backdrop-filter: blur(6px);
+}
+.av-lightbox__img {
+  max-width: 94vw;
+  max-height: 86vh;
+  width: auto;
+  height: auto;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: var(--bg);
+}
+.av-lightbox__close {
+  position: absolute;
+  top: clamp(0.75rem, 3vw, 1.5rem);
+  right: clamp(0.75rem, 3vw, 1.5rem);
+  padding: 0.4rem 0.8rem;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 8px;
+  background: rgba(10, 10, 12, 0.6);
+  color: #f5f5f7;
+  font-size: 0.8125rem; /* 13px */
+  cursor: pointer;
+  transition: background-color 140ms ease;
+}
+.av-lightbox__close:hover {
+  background: rgba(10, 10, 12, 0.9);
+}
+
+/* ---- How It Works: agent notes ---- */
+.av-agents {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+  margin: 1.75rem 0 0;
+}
+@media (min-width: 720px) {
+  .av-agents {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.75rem;
+  }
+}
+.av-agent {
+  padding-top: 0.9rem;
+  border-top: 2px solid color-mix(in srgb, var(--accent) 45%, transparent);
+}
+.av-agent__name {
+  margin: 0;
+  font-family: var(--font-display), sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+.av-agent__role {
+  margin: 0.35rem 0 0;
+  color: var(--text-meta);
+  font-size: 0.875rem; /* 14px */
+  line-height: 1.45;
+}
+.av-agent__detail {
+  margin: 0.6rem 0 0;
+  color: var(--text-body);
+  font-size: 0.9375rem; /* 15px */
+  line-height: 1.6;
+}
+.av-agent .av-todo {
+  margin-top: 0.6rem;
+}
+
+/* ---- Engineering highlights ---- */
+.av-highlights {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+.av-highlight:not(:first-child) {
+  padding-top: 2rem;
+  border-top: 1px solid var(--line-soft);
+}
+.av-highlight .av-subhead {
+  margin-top: 0;
+  font-size: 1.125rem; /* 18px */
+}
+
+/* ---- Copyable code excerpt ---- */
+.code {
+  margin: 1.25rem 0 0;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--panel);
+}
+.code-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.5rem 0.85rem;
+  border-bottom: 1px solid var(--line-soft);
+  background: color-mix(in srgb, var(--fg) 4%, transparent);
+}
+.code-file {
+  color: var(--text-meta);
+  font-size: 0.8125rem; /* 13px */
+}
+.code-lang {
+  color: var(--faint);
+  font-size: 0.75rem; /* 12px */
+  letter-spacing: 0.04em;
+}
+.code-copy {
+  padding: 0.2rem 0.6rem;
+  border: 1px solid var(--line-soft);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-meta);
+  font-size: 0.75rem; /* 12px */
+  cursor: pointer;
+  transition:
+    color 140ms ease,
+    border-color 140ms ease,
+    background-color 140ms ease;
+}
+.code-copy:hover {
+  color: var(--text-primary);
+  border-color: var(--line);
+  background: var(--panel);
+}
+.code-body {
+  margin: 0;
+  padding: 1rem 1.1rem;
+  overflow-x: auto;
+  color: var(--text-body);
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.8125rem; /* 13px */
+  line-height: 1.6;
+  tab-size: 2;
+}
+.code-body code {
+  font-family: inherit;
+}
+.code-ph {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1.1rem 1.1rem;
+}
+.code-ph .ph-text {
+  margin: 0;
+  color: var(--faint);
+  font-size: 0.8125rem; /* 13px */
+}
+
+/* ---- Results ---- */
+/* Glanceable stat strip — a quick, skimmable row of headline numbers. */
+.av-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.75rem;
+  margin: 0 0 1.5rem;
+}
+@media (max-width: 560px) {
+  .av-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+.av-stat {
+  margin: 0;
+  padding: 0.85rem 0.75rem;
+  background: var(--panel);
+  border: 1px solid var(--line-soft);
+  border-radius: 10px;
+  text-align: center;
+}
+.av-stat__value {
+  font-family: var(--font-display), sans-serif;
+  font-size: 1.45rem;
+  font-weight: 700;
+  line-height: 1.05;
+  color: var(--accent);
+}
+.av-stat__label {
+  margin: 0.35rem 0 0;
+  color: var(--text-meta);
+  font-size: 0.75rem; /* 12px */
+  line-height: 1.3;
+}
+.av-results {
+  max-width: 64ch;
+}
+
+/* ------------------------------------------------------------------ */
+/* Ask VALIANT showcase — compact two-column modal (demo + diagram)   */
+/* ------------------------------------------------------------------ */
+.av2-header {
+  padding: 0.5rem 0 1rem;
+  margin-bottom: 1.1rem;
+  border-bottom: 1px solid var(--line-soft);
+}
+.av2-titlerow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.3rem 0.9rem;
+}
+.av2-title {
+  margin: 0;
+  font-family: var(--font-display), sans-serif;
+  font-size: clamp(1.6rem, 3vw, 2.2rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+  color: var(--text-primary);
+}
+/* Understated inline Code ↗ link next to the title. */
+.av2-codelink {
+  color: var(--text-meta);
+  text-decoration: none;
+  font-size: 0.875rem; /* 14px */
+  transition: color 140ms ease;
+}
+.av2-codelink:hover {
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.av2-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.2rem 0.75rem;
+  margin: 0.4rem 0 0;
+  color: var(--text-meta);
+  font-size: 0.9375rem; /* 15px */
+}
+.av2-dates {
+  font-size: 0.8125rem; /* 13px */
+}
+.av2-desc {
+  margin: 0.5rem 0 0;
+  max-width: 76ch;
+  color: var(--text-body);
+  font-size: 1rem;
+  line-height: 1.55;
+}
+.av2-tags {
+  margin-top: 0.75rem;
+}
+
+/* Two columns on desktop (demo a touch wider than the diagram); stacked below. */
+.av2-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+  align-items: start;
+}
+@media (min-width: 900px) {
+  .av2-grid {
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+    gap: 2rem;
+  }
+}
+.av2-col {
+  min-width: 0;
+}
+/* Tighter, smaller numbered heading than the full case study. */
+.av2-colhead {
+  font-size: 1.1rem;
+  margin: 0 0 0.85rem;
+}
+.av2-media {
+  margin: 0;
+}
+.av2-points {
+  margin-top: 1rem;
+}
+.av2-points li {
+  font-size: 0.9375rem; /* 15px */
+  line-height: 1.5;
+}
+
+/* ---- Vertical architecture flow ---- */
+/* Sizing is em-relative off `.arch` font-size, so enlarging just scales the root. */
+.arch {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  font-size: 0.82rem;
+  color: var(--text-body);
+}
+.arch-row {
+  display: flex;
+  justify-content: center;
+  gap: 0.5em;
+  width: 100%;
+}
+.arch-row--1 .arch-box {
+  flex: 0 1 13em;
+}
+.arch-row--2 .arch-box,
+.arch-row--3 .arch-box {
+  flex: 1 1 0;
+}
+.arch-box {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.1em;
+  padding: 0.5em 0.6em;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 0.55em;
+  font-size: 1em;
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--text-primary);
+  text-align: center;
+}
+.arch-box small {
+  font-weight: 400;
+  font-size: 0.78em;
+  color: var(--text-meta);
+}
+.arch-box--router,
+.arch-box--key {
+  border-color: color-mix(in srgb, var(--accent) 48%, transparent);
+}
+.arch-box--resp {
+  border-color: color-mix(in srgb, var(--accent) 30%, transparent);
+}
+.arch-box--muted {
+  color: var(--text-meta);
+}
+.arch-box--muted small {
+  color: var(--faint);
+}
+.arch-arrow {
+  color: var(--faint);
+  font-size: 1.1em;
+  line-height: 1;
+  margin: 0.3em 0;
+}
+
+/* ---- Card preview video (home Projects section) ---- */
+.pj-thumb__media {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }

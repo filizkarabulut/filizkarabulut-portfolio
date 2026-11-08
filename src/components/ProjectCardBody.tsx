@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { ProjectCard } from "@/data/portfolio";
+import { CardVideo } from "./CardVideo";
 import { Chip, TagRow } from "./primitives";
 import { StatText } from "./StatText";
 
@@ -71,7 +72,13 @@ export function ProjectCardBody({
       {main}
       <aside className="pj-aside">
         <div className="pj-thumb">
-          {p.thumbnail ? (
+          {p.thumbnailVideo && p.thumbnail ? (
+            <CardVideo
+              src={p.thumbnailVideo}
+              poster={p.thumbnail}
+              alt={p.thumbnailAlt ?? `${p.name} demo preview`}
+            />
+          ) : p.thumbnail ? (
             <Image
               src={p.thumbnail}
               alt={p.thumbnailAlt ?? `${p.name} preview`}

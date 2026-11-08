@@ -799,6 +799,12 @@ export interface ProjectCard {
    */
   thumbnail?: string;
   thumbnailAlt?: string;
+  /**
+   * Optional looping preview video for the card thumbnail (muted autoplay). When
+   * set, the card plays this in place of the static `thumbnail` image (which is
+   * reused as its poster / reduced-motion fallback).
+   */
+  thumbnailVideo?: string;
   /** If set, "Learn more →" opens the project popup at /projects/<slug>. */
   caseStudySlug?: string;
   /** Résumé detail shown under an "Overview" heading inside the popup/full page. */
@@ -834,7 +840,9 @@ export const projectCards: ProjectCard[] = [
     links: [
       { label: "Code", href: "https://github.com/filizkarabulut/ask-valiant" },
     ],
-    // TODO: add a short Ask VALIANT chat screenshot/demo at /public/projects/ask-valiant.*
+    thumbnail: "/projects/ask-valiant/poster.jpg",
+    thumbnailAlt: "Ask VALIANT web app — the VALIANT research-matchmaking landing page",
+    thumbnailVideo: "/projects/ask-valiant/demo.mp4",
     caseStudySlug: "ask-valiant",
     overview: [
       "Built a multi-agent research assistant for Vanderbilt's VALIANT lab that routes industry questions through router, research, and knowledge agents to match them with 134 AI faculty and their 6K+ PubMed papers.",
@@ -846,3 +854,335 @@ export const projectCards: ProjectCard[] = [
 /** Look up a project card by its case-study slug. */
 export const projectCardBySlug = (slug: string): ProjectCard | undefined =>
   projectCards.find((p) => p.caseStudySlug === slug);
+
+/* ------------------------------------------------------------------ */
+/* Project case studies — the long-form content shown inside the        */
+/* macOS-style modal at /projects/<slug> (SpIQ and Ask VALIANT).        */
+/* ------------------------------------------------------------------ */
+/*
+ * Each entry holds the BODY of a case study (the 01–05 sections). The header
+ * inside the modal (name, role/awards, dates, description, tags, GitHub link)
+ * is reused from the matching `ProjectCard` above — not duplicated here.
+ *
+ * Anything marked `todo: true`, or a paragraph that begins with "TODO", renders
+ * as a clearly-labelled placeholder until it's filled in. Do NOT invent demo
+ * videos, diagrams, code, metrics, or implementation details — leave the
+ * placeholder until the real content exists.
+ *
+ * Media to drop in later (any web format; just set the matching `src`):
+ *   • Demo video   → /public/projects/<slug>/demo.mp4  (+ optional poster and
+ *                     a .vtt captions track)
+ *   • Architecture → /public/projects/<slug>/architecture.(png|svg|webp)
+ */
+
+/** A media slot (demo video / architecture diagram). Shows a labelled
+ *  placeholder until `src` is set. */
+export interface CaseStudyMedia {
+  /** Public path once uploaded (e.g. "/projects/ask-valiant/demo.mp4"). */
+  src?: string;
+  /** Short caption / accessible description. */
+  caption: string;
+  /** Hint shown inside the empty placeholder (where to drop the file). */
+  placeholderHint?: string;
+  /** Video only — optional poster still shown before playback. */
+  poster?: string;
+  /** Video only — optional WebVTT captions track (e.g. "…/demo.vtt"). */
+  captions?: string;
+}
+
+/** One specialized agent in the How It Works section. */
+export interface AgentNote {
+  name: string;
+  /** One-line role summary (safe to state from the agent's purpose). */
+  role: string;
+  /** Short explanation. Mark `todo` when the specifics still need filling in. */
+  detail: string;
+  todo?: boolean;
+}
+
+/** An optional, copyable code excerpt attached to an engineering highlight. */
+export interface CodeExcerpt {
+  /** File/label shown in the code frame's header (e.g. "router.py"). */
+  filename?: string;
+  /** Language label + highlight hint (e.g. "python"). */
+  language?: string;
+  /** The code. When omitted, a labelled "coming soon" code placeholder shows. */
+  snippet?: string;
+}
+
+/** One subsection of Engineering Highlights. */
+export interface EngineeringHighlight {
+  title: string;
+  /** Long-form paragraphs. Paragraphs beginning "TODO" render muted. */
+  body?: string[];
+  /** Concise bullet points — preferred for a skimmable highlight. */
+  points?: string[];
+  /** Optional code excerpt (or a placeholder when `code` is set but empty). */
+  code?: CodeExcerpt;
+}
+
+/** A single glanceable stat in the Results strip (e.g. "135" / "Faculty"). */
+export interface CaseStudyStat {
+  value: string;
+  label: string;
+}
+
+export interface ProjectCaseStudyData {
+  /** 01 — Demo. */
+  demo: CaseStudyMedia;
+  /** 02 — The Problem (one short paragraph). */
+  problem: string[];
+  /** 03 — How It Works. */
+  howItWorks: {
+    /** A themed node/edge architecture diagram (preferred when available). */
+    diagramData?: Diagram;
+    /** An image / labelled-placeholder media slot (used when there's no
+     *  `diagramData`). One of the two should be set. */
+    diagram?: CaseStudyMedia;
+    /** Optional orienting lines above the diagram. */
+    overview?: string[];
+    /** Optional concise technical bullets shown beside/under the diagram. */
+    points?: string[];
+    /** Optional per-agent notes (multi-agent projects like Ask VALIANT). */
+    agents?: AgentNote[];
+    /** Optional note on how the pieces coordinate. */
+    collaboration?: string[];
+  };
+  /** 04 — Engineering Highlights (subsections). */
+  engineering: EngineeringHighlight[];
+  /** 05 — Results & Impact. */
+  results: {
+    /** Optional glanceable stat strip, shown above the points. */
+    stats?: CaseStudyStat[];
+    points: string[];
+    /** Muted closing note leaving room for verified metrics. */
+    note?: string;
+  };
+}
+
+const askValiant: ProjectCaseStudyData = {
+  demo: {
+    src: "/projects/ask-valiant/demo.mp4",
+    poster: "/projects/ask-valiant/poster.jpg",
+    caption:
+      "A short walkthrough of Ask VALIANT: submitting an industry research question and getting back the Vanderbilt faculty whose expertise and publications best match it.",
+  },
+  problem: [
+    "Matching an industry research question to the right expert among VALIANT's 135 AI & imaging faculty normally means manually combing through profiles, research areas, and publications. Ask VALIANT answers it from one plain-language question.",
+  ],
+  howItWorks: {
+    diagramData: {
+      viewBox: "0 0 1600 360",
+      nodes: [
+        { id: "user", label: "User query", x: 0, y: 153, w: 150, h: 54 },
+        {
+          id: "router",
+          label: "Router assistant · classify intent",
+          x: 220,
+          y: 153,
+          w: 200,
+          h: 54,
+        },
+        {
+          id: "main",
+          label: "Main assistant · VALIANT info & FAQs",
+          x: 500,
+          y: 16,
+          w: 200,
+          h: 54,
+        },
+        {
+          id: "research",
+          label: "Research assistant · faculty matching",
+          x: 500,
+          y: 153,
+          w: 200,
+          h: 54,
+        },
+        {
+          id: "followup",
+          label: "Follow-up assistant · context continuity",
+          x: 500,
+          y: 290,
+          w: 200,
+          h: 54,
+        },
+        {
+          id: "matching",
+          label: "Faculty matching · 3-tier cascade",
+          x: 790,
+          y: 96,
+          w: 210,
+          h: 54,
+        },
+        {
+          id: "pubmed",
+          label: "PubMed API · live publications",
+          x: 790,
+          y: 206,
+          w: 200,
+          h: 54,
+        },
+        {
+          id: "response",
+          label: "Response generation",
+          x: 1090,
+          y: 153,
+          w: 190,
+          h: 54,
+        },
+        {
+          id: "db",
+          label: "Database · history & analytics",
+          x: 1370,
+          y: 86,
+          w: 180,
+          h: 54,
+        },
+        {
+          id: "admin",
+          label: "Admin dashboard · analytics & errors",
+          x: 1370,
+          y: 220,
+          w: 200,
+          h: 54,
+        },
+      ],
+      edges: [
+        { from: "user", to: "router" },
+        { from: "router", to: "main" },
+        { from: "router", to: "research" },
+        { from: "router", to: "followup" },
+        { from: "research", to: "matching" },
+        { from: "research", to: "pubmed" },
+        { from: "matching", to: "response" },
+        { from: "pubmed", to: "response" },
+        { from: "main", to: "response" },
+        { from: "followup", to: "response" },
+        { from: "response", to: "db" },
+        { from: "db", to: "admin" },
+      ],
+      caption:
+        "Router → one of three assistants → 3-tier faculty matching + live PubMed → cited response. Every exchange is logged for the admin dashboard.",
+    },
+    points: [
+      "A router classifies intent, then routes to one of three assistants.",
+      "3-tier faculty matching: keywords → research-area text → department fallback.",
+      "Amplify AI (GPT-4.1-mini) · Flask · TinyDB · live PubMed citations.",
+    ],
+  },
+  engineering: [
+    {
+      title: "Custom Router Logic",
+      points: [
+        "Classifies every query: general info · research · follow-up.",
+        "Dispatches to one assistant — matching + PubMed only run for research queries.",
+      ],
+      // `snippet` left empty → renders a labelled, copy-ready code placeholder.
+      code: { filename: "router.py", language: "python" },
+    },
+    {
+      title: "3-Tier Faculty Matching",
+      points: [
+        "Tier 1 — exact research-keyword match (fast path).",
+        "Tier 2 — semantic search across full research-area text.",
+        "Tier 3 — AI department fallback, so nothing goes unmatched.",
+        "Score-gap filter keeps only clearly-relevant faculty.",
+      ],
+    },
+    {
+      title: "Orchestration & Stack",
+      points: [
+        "Three assistants on Amplify AI (GPT-4.1-mini), dispatched by the router.",
+        "Flask · TinyDB · Flask-Login · Server-Sent Events streaming.",
+      ],
+    },
+  ],
+  results: {
+    stats: [
+      { value: "135", label: "Faculty indexed" },
+      { value: "3", label: "AI assistants" },
+      { value: "3-tier", label: "Faculty matching" },
+      { value: "Live", label: "PubMed integration" },
+    ],
+    points: [
+      "Cited results — each match links its recent PubMed papers (PMID).",
+      "Admin dashboard tracks matching tier, errors, and usage.",
+    ],
+    note: "Room for verified usage metrics as the platform is used.",
+  },
+};
+
+const spiq: ProjectCaseStudyData = {
+  demo: {
+    // TODO: drop the recording in and set src.
+    caption:
+      "A short walkthrough of SpIQ: speaking to the webcam and getting real-time, on-screen feedback on delivery signals like eye contact, gestures, and head stability.",
+    placeholderHint: "Add demo.mp4 to /public/projects/spiq/",
+  },
+  problem: [
+    "Interview and presentation delivery is hard to self-assess — most feedback is subjective and arrives long after the moment has passed. SpIQ was built at HackMT 2026 to give speakers objective, real-time feedback on how they come across on camera.",
+  ],
+  howItWorks: {
+    diagram: {
+      // TODO: drop the architecture / pipeline diagram in and set src.
+      caption:
+        "SpIQ's computer-vision pipeline — webcam frames in, behavioral signals out, scored over rolling windows.",
+      placeholderHint: "Add architecture.(png|svg|webp) to /public/projects/spiq/",
+    },
+    overview: [
+      "SpIQ runs a computer-vision pipeline over live webcam video. It tracks nine behavioral signals — including eye contact, gestures, blink rate, head stability, and body sway — over rolling 15-second windows and reports them as structured JSON scores that drive the real-time feedback shown to the speaker.",
+    ],
+  },
+  engineering: [
+    {
+      title: "Computer Vision Pipeline",
+      body: [
+        "The backend (Python, MediaPipe, OpenCV, Flask) processes webcam frames to extract facial and pose landmarks, the raw input every behavioral signal is derived from.",
+        "TODO: Explain how frames are captured and processed, and any performance work needed to keep it responsive.",
+      ],
+      // `snippet` left empty → renders a labelled, copy-ready code placeholder.
+      code: { filename: "signals.py", language: "python" },
+    },
+    {
+      title: "Behavioral Signal Analysis",
+      body: [
+        "Nine behavioral signals — eye contact, gestures, blink rate, head stability, body sway, and more — are computed from the landmarks over rolling 15-second windows and emitted as JSON scores.",
+        "TODO: Explain how a couple of the signals are actually measured from the landmarks, and how the windowing is handled.",
+      ],
+    },
+    {
+      title: "Real-Time Feedback",
+      body: [
+        "The Flask backend serves the scored signals continuously so the interface can surface feedback to the speaker while they're still talking, rather than in a report afterward.",
+        "TODO: Explain how scores flow to the frontend and how the live feedback is presented.",
+      ],
+    },
+    {
+      title: "Shipping Under Hackathon Constraints",
+      body: [
+        "SpIQ was designed, built, and demoed by a team of 6 within the HackMT 2026 window, which meant scoping the signal set and the pipeline to what could be made reliable in time.",
+        "TODO: Call out a specific scoping decision or tradeoff the deadline forced, and how you divided the work across the team.",
+      ],
+    },
+  ],
+  results: {
+    points: [
+      "Won 1st Place and Hacker's Choice at HackMT 2026.",
+      "Tracks nine behavioral delivery signals in real time from webcam video.",
+      "Built end to end by a team of 6 during the hackathon.",
+    ],
+    note: "Room for additional verified results or usage metrics.",
+  },
+};
+
+/** Case-study body content, keyed by project slug. */
+export const projectCaseStudyContent: Record<string, ProjectCaseStudyData> = {
+  "ask-valiant": askValiant,
+  spiq,
+};
+
+/** Look up a project's case-study body content by slug. */
+export const caseStudyContentBySlug = (
+  slug: string,
+): ProjectCaseStudyData | undefined => projectCaseStudyContent[slug];

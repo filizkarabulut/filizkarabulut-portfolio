@@ -71,11 +71,16 @@ try{
 }catch(e){}
 try{
   var h=document.documentElement;
+  // The intro animates the home-page laptop/sidebar and is cleaned up by the
+  // Intro component, which only mounts on "/". Gating it to the home route keeps
+  // other routes (e.g. the case-study pages) from being stuck scroll-locked on a
+  // cold/direct visit, where nothing would ever remove the intro-play class.
+  var home=location.pathname==='/';
   var force=new URLSearchParams(location.search).get('intro')==='1';
   var reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
   var hasHash=location.hash.length>1;
   var seen=sessionStorage.getItem('introSeen');
-  if(!reduced&&(force||(!hasHash&&!seen)))h.classList.add('intro-play');
+  if(home&&!reduced&&(force||(!hasHash&&!seen)))h.classList.add('intro-play');
   sessionStorage.setItem('introSeen','1');
 }catch(e){}`,
           }}
