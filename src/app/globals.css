@@ -2103,6 +2103,12 @@ html.intro-run .site-footer {
   background: linear-gradient(180deg, #2b2b31, #212127);
   border-bottom: 1px solid rgba(0, 0, 0, 0.5);
 }
+/* Light mode: a subtle light-gray bar with a thin divider. The traffic-light
+   controls and the medium-gray title (var(--text-meta)) carry over unchanged. */
+:root[data-theme="light"] .finder-titlebar {
+  background: linear-gradient(180deg, #f1f1f4, #e8e8ec);
+  border-bottom: 1px solid var(--line);
+}
 .finder-lights {
   display: flex;
   align-items: center;

@@ -4,9 +4,43 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef } from "react";
 import type { ProjectCard } from "@/data/portfolio";
 import { caseStudyContentBySlug } from "@/data/portfolio";
-import { AskValiantShowcase } from "./AskValiantShowcase";
+import { AskValiantArchitecture } from "./AskValiantArchitecture";
+import type { NodeDetail } from "./architectureNodes";
+import { NODE_DETAILS } from "./askValiantNodes";
 import { ProjectCardBody, ProjectOverview } from "./ProjectCardBody";
 import { ProjectCaseStudy } from "./ProjectCaseStudy";
+import { ProjectShowcase } from "./ProjectShowcase";
+import { SpiqArchitecture } from "./SpiqArchitecture";
+import { SPIQ_NODE_DETAILS } from "./spiqNodes";
+
+/** Per-project config for the compact two-column showcase (demo + interactive
+ *  architecture). Projects not listed here fall back to the full case study. */
+const SHOWCASES: Record<
+  string,
+  {
+    details: Record<string, NodeDetail>;
+    hint: string;
+    renderDiagram: (
+      selected: string | null,
+      onSelect: (id: string) => void,
+    ) => React.ReactNode;
+  }
+> = {
+  "ask-valiant": {
+    details: NODE_DETAILS,
+    hint: "Click the router, an assistant, or faculty matching to explore the implementation.",
+    renderDiagram: (selected, onSelect) => (
+      <AskValiantArchitecture selected={selected} onSelect={onSelect} />
+    ),
+  },
+  spiq: {
+    details: SPIQ_NODE_DETAILS,
+    hint: "Click a model or the fusion layer to explore the implementation.",
+    renderDiagram: (selected, onSelect) => (
+      <SpiqArchitecture selected={selected} onSelect={onSelect} />
+    ),
+  },
+};
 
 const FOCUSABLE =
   'a[href],button:not([disabled]),input,textarea,select,video,[tabindex]:not([tabindex="-1"])';
@@ -40,8 +74,10 @@ export function ProjectModal({
 
   const slug = project.caseStudySlug;
   const content = slug ? caseStudyContentBySlug(slug) : undefined;
-  // Ask VALIANT uses a larger, two-column (demo + architecture) compact layout.
-  const isShowcase = slug === "ask-valiant" && Boolean(content);
+  // SpIQ and Ask VALIANT use the larger, two-column (demo + interactive
+  // architecture) compact showcase layout.
+  const showcase = slug ? SHOWCASES[slug] : undefined;
+  const isShowcase = Boolean(showcase && content);
 
   const close = () => {
     if (intercepted) {
@@ -133,8 +169,14 @@ export function ProjectModal({
           </span>
         </div>
         <div className="finder-body" ref={bodyRef} tabIndex={-1}>
-          {isShowcase && content ? (
-            <AskValiantShowcase card={project} data={content} />
+          {isShowcase && content && showcase ? (
+            <ProjectShowcase
+              card={project}
+              data={content}
+              details={showcase.details}
+              hint={showcase.hint}
+              renderDiagram={showcase.renderDiagram}
+            />
           ) : content ? (
             <ProjectCaseStudy card={project} data={content} />
           ) : (

@@ -1,24 +1,38 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { AskValiantArchitecture } from "./AskValiantArchitecture";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { CodeBlock } from "./CodeBlock";
-import { NODE_DETAILS, type NodeId } from "./askValiantNodes";
+import type { NodeDetail } from "./architectureNodes";
 
 /**
- * The interactive "How It Works" column: the architecture diagram plus a single
- * swappable detail area beneath it. By default that area shows the summary
- * bullets; clicking a component (router, an assistant, or faculty matching)
- * replaces them with that component's detail panel. Only one panel is open at a
- * time; selecting another swaps it, and Close (button or Esc) returns to the
- * bullets. Keeping both states in the same slot avoids layout jumps.
+ * The interactive "How It Works" column: a project's architecture diagram plus a
+ * single swappable detail area beneath it. By default that area shows the summary
+ * bullets; clicking a diagram component replaces them with that component's panel
+ * (a concise summary + an optional "View technical details" disclosure). Only one
+ * panel is open at a time; selecting another swaps it, and Close (button or Esc)
+ * returns to the bullets. A reserved min-height keeps switching from shifting the
+ * layout. The diagram itself is supplied by `renderDiagram` so each project draws
+ * its own flow while sharing this behavior.
  */
-export function AskValiantHowItWorks({ points }: { points: string[] }) {
-  const [selected, setSelected] = useState<NodeId | null>(null);
+export function ArchitectureExplorer({
+  points,
+  details,
+  hint,
+  renderDiagram,
+}: {
+  points: string[];
+  details: Record<string, NodeDetail>;
+  hint: string;
+  renderDiagram: (
+    selected: string | null,
+    onSelect: (id: string) => void,
+  ) => ReactNode;
+}) {
+  const [selected, setSelected] = useState<string | null>(null);
   const [expanded, setExpanded] = useState(false);
   const panelRef = useRef<HTMLDivElement>(null);
 
-  const select = (id: NodeId) => {
+  const select = (id: string) => {
     setSelected((cur) => (cur === id ? null : id));
     setExpanded(false); // each component opens collapsed
   };
@@ -43,12 +57,12 @@ export function AskValiantHowItWorks({ points }: { points: string[] }) {
     if (selected) panelRef.current?.focus({ preventScroll: true });
   }, [selected]);
 
-  const detail = selected ? NODE_DETAILS[selected] : null;
+  const detail = selected ? details[selected] : null;
   const hasMore = Boolean(detail && (detail.details?.length || detail.code));
 
   return (
     <>
-      <AskValiantArchitecture selected={selected} onSelect={select} />
+      {renderDiagram(selected, select)}
 
       {/* Fixed-height slot so switching components never shifts the layout. */}
       <div className="av2-explore">
@@ -107,8 +121,7 @@ export function AskValiantHowItWorks({ points }: { points: string[] }) {
               </ul>
             )}
             <p className="av2-hint mono" aria-hidden="true">
-              Click the router, an assistant, or faculty matching to explore
-              the implementation.
+              {hint}
             </p>
           </>
         )}

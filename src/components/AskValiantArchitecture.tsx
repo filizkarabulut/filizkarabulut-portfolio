@@ -1,37 +1,6 @@
 "use client";
 
-import type { NodeId } from "./askValiantNodes";
-
-/** A clickable component box (button) with hover/selected highlight. */
-function Node({
-  id,
-  label,
-  sub,
-  accent,
-  selected,
-  onSelect,
-}: {
-  id: NodeId;
-  label: string;
-  sub?: string;
-  accent?: boolean;
-  selected: NodeId | null;
-  onSelect: (id: NodeId) => void;
-}) {
-  return (
-    <button
-      type="button"
-      className={`arch-box arch-box--btn${accent ? " arch-box--key" : ""}${
-        selected === id ? " is-selected" : ""
-      }`}
-      aria-pressed={selected === id}
-      onClick={() => onSelect(id)}
-    >
-      {label}
-      {sub && <small>{sub}</small>}
-    </button>
-  );
-}
+import { ArchBox as Node } from "./ArchBox";
 
 /**
  * Ask VALIANT's real multi-agent architecture, drawn as a compact vertical flow
@@ -48,8 +17,8 @@ export function AskValiantArchitecture({
   selected,
   onSelect,
 }: {
-  selected: NodeId | null;
-  onSelect: (id: NodeId) => void;
+  selected: string | null;
+  onSelect: (id: string) => void;
 }) {
   const nodeProps = { selected, onSelect };
   return (

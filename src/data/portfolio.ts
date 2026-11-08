@@ -1133,6 +1133,11 @@ const spiq: ProjectCaseStudyData = {
     overview: [
       "SpIQ runs a computer-vision pipeline over live webcam video. It tracks nine behavioral signals — including eye contact, gestures, blink rate, head stability, and body sway — over rolling 15-second windows and reports them as structured JSON scores that drive the real-time feedback shown to the speaker.",
     ],
+    points: [
+      "Webcam + mic in → parallel visual, vocal, and verbal models → a fused score with coaching.",
+      "Grounded in the Mehrabian rule: ~55% visual, ~38% vocal, ~7% verbal.",
+      "Python · MediaPipe · OpenCV · Whisper · GPT · Flask.",
+    ],
   },
   engineering: [
     {

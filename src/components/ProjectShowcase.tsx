@@ -1,5 +1,8 @@
+import type { ReactNode } from "react";
 import type { ProjectCard, ProjectCaseStudyData } from "@/data/portfolio";
-import { AskValiantHowItWorks } from "./AskValiantHowItWorks";
+import { ArchitectureExplorer } from "./ArchitectureExplorer";
+import type { NodeDetail } from "./architectureNodes";
+import { StatText } from "./StatText";
 
 /** A numbered column heading: "01 / Demo". */
 function ColHead({ num, title }: { num: string; title: string }) {
@@ -17,17 +20,27 @@ function ColHead({ num, title }: { num: string; title: string }) {
 }
 
 /**
- * The compact Ask VALIANT modal body: a tight header (title with an inline
- * Code ↗ link, meta, one-line description, tags) over a two-column layout that
- * puts the demo video and the architecture diagram side by side on desktop and
- * stacks them on narrow screens. No long prose — the essentials only.
+ * The compact project showcase shown in the macOS modal: a tight header (title
+ * with an inline Code ↗ link, meta, one-line description, tags) over a two-column
+ * layout that puts the demo video and an interactive architecture diagram side by
+ * side on desktop and stacks them on narrow screens. Shared by SpIQ and Ask
+ * VALIANT; each supplies its own diagram renderer and node details.
  */
-export function AskValiantShowcase({
+export function ProjectShowcase({
   card,
   data,
+  details,
+  hint,
+  renderDiagram,
 }: {
   card: ProjectCard;
   data: ProjectCaseStudyData;
+  details: Record<string, NodeDetail>;
+  hint: string;
+  renderDiagram: (
+    selected: string | null,
+    onSelect: (id: string) => void,
+  ) => ReactNode;
 }) {
   const demo = data.demo;
   const points = data.howItWorks.points ?? [];
@@ -52,7 +65,7 @@ export function AskValiantShowcase({
         </div>
         {card.subtitle && (
           <p className="av2-meta">
-            {card.subtitle}
+            <StatText text={card.subtitle} emphasize={card.subtitleEmphasis} />
             <span className="av2-dates mono">{card.dates}</span>
           </p>
         )}
@@ -72,24 +85,34 @@ export function AskValiantShowcase({
           <ColHead num="01" title="Demo" />
           <figure className="av-media av2-media">
             <div className="av-video">
-              <video
-                className="av-video__el"
-                controls
-                playsInline
-                preload="metadata"
-                poster={demo.poster}
-              >
-                <source src={demo.src} type="video/mp4" />
-                {demo.captions && (
-                  <track
-                    kind="captions"
-                    src={demo.captions}
-                    srcLang="en"
-                    label="English"
-                    default
-                  />
-                )}
-              </video>
+              {demo.src ? (
+                <video
+                  className="av-video__el"
+                  controls
+                  playsInline
+                  preload="metadata"
+                  poster={demo.poster}
+                >
+                  <source src={demo.src} type="video/mp4" />
+                  {demo.captions && (
+                    <track
+                      kind="captions"
+                      src={demo.captions}
+                      srcLang="en"
+                      label="English"
+                      default
+                    />
+                  )}
+                </video>
+              ) : (
+                <div className="av-ph av-ph--video">
+                  <span className="av-play" aria-hidden="true" />
+                  <p className="ph-title">Demo video coming soon</p>
+                  {demo.placeholderHint && (
+                    <p className="ph-hint mono">{demo.placeholderHint}</p>
+                  )}
+                </div>
+              )}
             </div>
             <figcaption className="av-caption">{demo.caption}</figcaption>
           </figure>
@@ -97,7 +120,12 @@ export function AskValiantShowcase({
 
         <section className="av2-col av2-col--how">
           <ColHead num="02" title="How It Works" />
-          <AskValiantHowItWorks points={points} />
+          <ArchitectureExplorer
+            points={points}
+            details={details}
+            hint={hint}
+            renderDiagram={renderDiagram}
+          />
         </section>
       </div>
     </div>
