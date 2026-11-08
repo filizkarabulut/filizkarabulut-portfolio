@@ -28,6 +28,10 @@ interface StickerProps {
   z?: number;
   /** Stagger index for the intro pop-in (FK = 0). Lid only. */
   ii?: number;
+  /** Interaction-group key (lid only). Stickers sharing a group light up
+   *  together on hover/focus of any one of them (see the `.sticker--group-*`
+   *  rules in globals.css). Used for the "Off the Clock" cluster. */
+  group?: string;
   /** Resolved art (path + intrinsic size) from the server-side scan of
    *  /public/stickers. Undefined → show the colored label placeholder. */
   image?: StickerImage;
@@ -47,6 +51,7 @@ export function Sticker({
   gs,
   z,
   ii,
+  group,
   image,
   mini = false,
 }: StickerProps) {
@@ -77,6 +82,7 @@ export function Sticker({
     `shape-${sticker.shape}`,
     active ? "is-active" : "is-dimmed",
     !hasImage && !mini ? "sticker--no-image" : "",
+    group && !mini ? `sticker--group-${group}` : "",
   ]
     .filter(Boolean)
     .join(" ");

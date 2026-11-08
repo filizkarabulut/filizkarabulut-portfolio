@@ -699,11 +699,11 @@ export const stickers: Sticker[] = [
     id: "git-commit",
     image: "/stickers/git-commit",
     label: 'git commit -m "build cool things"',
-    ariaLabel: "git commit sticker — jump to About",
+    ariaLabel: "git commit sticker — jump to Projects",
     size: "M",
     shape: "tag",
     color: "#0f172a",
-    opens: "about",
+    opens: "projects",
   },
   {
     id: "violin",

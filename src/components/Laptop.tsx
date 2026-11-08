@@ -41,10 +41,22 @@ export function Laptop({ activeSection, onOpen, stickerSrc }: LaptopProps) {
     id: string,
     width: string,
     rot: number,
-    extra?: { dx?: string; dy?: string; gs?: number; z?: number; ii?: number },
+    extra?: {
+      dx?: string;
+      dy?: string;
+      gs?: number;
+      z?: number;
+      ii?: number;
+      /** Interaction-group key — grouped stickers light up together on hover. */
+      group?: string;
+      /** Override the per-sticker tip. `null` suppresses it (so a grouped
+       *  cluster shows one shared label on a single sticker instead of three). */
+      tip?: string | null;
+    },
   ) => {
     const sticker = BY_ID.get(id);
     if (!sticker) return null;
+    const tip = extra?.tip !== undefined ? extra.tip : tipFor(sticker);
     return (
       <Sticker
         sticker={sticker}
@@ -55,9 +67,10 @@ export function Laptop({ activeSection, onOpen, stickerSrc }: LaptopProps) {
         gs={extra?.gs}
         z={extra?.z}
         ii={extra?.ii}
+        group={extra?.group}
         image={stickerSrc[id]}
         active={sticker.opens === activeSection}
-        tip={tipFor(sticker)}
+        tip={tip ?? undefined}
         onOpen={onOpen}
       />
     );
@@ -72,10 +85,13 @@ export function Laptop({ activeSection, onOpen, stickerSrc }: LaptopProps) {
           {slot("valiant", "75%", 6, { ii: 4 })}
           {/* Violin + hiker + film strip form one tight overlapping row, scaled
               up ~15% as a group and shifted left; violin in front, then hiker,
-              then film. Translates keep them in flow so no column re-flows. */}
+              then film. Translates keep them in flow so no column re-flows.
+              All three share the "play" interaction group so hovering any one
+              lights up the whole cluster under a single "Off the Clock" label
+              (shown on the violin); each still navigates to Off the clock. */}
           <div className="lid-pair">
-            {slot("hiking", "44%", 0, { dx: "5cqw", dy: "-4cqh", gs: 1.15, z: 5, ii: 8 })}
-            {slot("violin", "48%", 2, { dx: "0cqw", gs: 1.15, z: 4, ii: 9 })}
+            {slot("hiking", "44%", 0, { dx: "5cqw", dy: "-4cqh", gs: 1.15, z: 5, ii: 8, group: "play", tip: null })}
+            {slot("violin", "48%", 2, { dx: "0cqw", gs: 1.15, z: 4, ii: 9, group: "play", tip: "Off the Clock →" })}
           </div>
         </div>
 
@@ -84,7 +100,7 @@ export function Laptop({ activeSection, onOpen, stickerSrc }: LaptopProps) {
           {/* FK pops in first (ii: 0). */}
           <div className="lid-center-fk">{slot("fk", "100%", -3, { ii: 0 })}</div>
           <div className="lid-bottom-row">
-            {slot("film", "35%", -6, { dx: "-7cqw", dy: "-1cqh", gs: 1.15, z: 3, ii: 7 })}
+            {slot("film", "35%", -6, { dx: "-7cqw", dy: "-1cqh", gs: 1.15, z: 3, ii: 7, group: "play", tip: null })}
             {slot("git-commit", "60%", 2, { dx: "-3cqw", dy: "-10.5cqh", ii: 6 })}
           </div>
         </div>

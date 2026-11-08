@@ -126,7 +126,7 @@ export function Shell({
               rel="noopener noreferrer"
               className="sidebar-action"
             >
-              Résumé <span aria-hidden="true">↗</span>
+              Resume <span aria-hidden="true">↗</span>
             </a>
             <a
               href="#contact"

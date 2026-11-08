@@ -77,7 +77,7 @@ export function CommandPalette() {
       },
       {
         kind: "action",
-        label: "Open résumé",
+        label: "Open resume",
         hint: "new tab",
         run: () => window.open(resumeUrl, "_blank", "noopener,noreferrer"),
       },

@@ -166,7 +166,7 @@ export default function Home() {
               </li>
               <li>
                 <a href={resumeUrl} target="_blank" rel="noopener noreferrer">
-                  Résumé <span aria-hidden="true">↗</span>
+                  Resume <span aria-hidden="true">↗</span>
                 </a>
               </li>
             </ul>

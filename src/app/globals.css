@@ -638,6 +638,27 @@ a {
   transform: translate(-50%, 0);
 }
 
+/* "Off the Clock" cluster — the violin, hiker, and film stickers act as one
+   group: hovering (or focusing) any one lifts all three together and reveals a
+   single shared "Off the Clock" label (rendered on the violin; the other two
+   carry no tip). The stickers live in different lid columns, so the match is
+   anchored on their common ancestor .lid-grid. :has() tracks the hover state
+   continuously, so moving between the overlapping stickers never flickers.
+   Each sticker keeps its own click → Off the clock navigation. */
+.lid-grid:has(.sticker--group-play:hover) .sticker--group-play,
+.lid-grid:has(.sticker--group-play:focus-visible) .sticker--group-play {
+  opacity: 1;
+  --s: 1.06;
+  z-index: 95;
+}
+.lid-grid:has(.sticker--group-play:hover) .sticker--group-play .sticker-tip,
+.lid-grid:has(.sticker--group-play:focus-visible)
+  .sticker--group-play
+  .sticker-tip {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
 /* Mini stickers in the mobile sticky bar. */
 .sticker-mini {
   position: relative;
