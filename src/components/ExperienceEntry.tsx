@@ -36,6 +36,8 @@ export function ExperienceEntry({ entry: e }: { entry: Entry }) {
         <span className="xp-dates mono">{e.dates}</span>
       </div>
 
+      {e.note && <p className="xp-note">{e.note}</p>}
+
       {hasContext && (
         <p className="xp-context">
           {e.context && <span className="xp-context__text">{e.context}</span>}
@@ -56,7 +58,14 @@ export function ExperienceEntry({ entry: e }: { entry: Entry }) {
       <ul className="xp-items">
         {e.items.map((it, i) => (
           <li key={i} className="xp-item">
-            {it.title && <h4 className="xp-item__title">{it.title}</h4>}
+            {it.title && (
+              <h4 className="xp-item__title">
+                {it.title}
+                {it.inProgress && (
+                  <span className="xp-item__status">In&nbsp;Progress</span>
+                )}
+              </h4>
+            )}
             {it.description && (
               <p className="xp-item__desc">
                 <StatText text={it.description} />

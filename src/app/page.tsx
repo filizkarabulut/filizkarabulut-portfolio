@@ -18,10 +18,14 @@ import {
   leadership,
   projectCards,
   githubUrl,
+  letterboxdUrl,
   linkedinUrl,
   offTheClock,
   resumeUrl,
 } from "@/data/portfolio";
+
+/** Split the Off-the-clock line so only the word "films" becomes a link. */
+const [offTheClockBefore, offTheClockAfter] = offTheClock.split("films");
 
 /** A top-level page section: focusable (for scroll-to) with a mono eyebrow. */
 function Section({
@@ -56,7 +60,10 @@ export default function Home() {
         <Section id="about" title="About">
         <Reveal>
           <p className="prose">
-            <StatText text={about.lead} />
+            <StatText
+              text={about.lead}
+              emphasize={["AI Research Intern", "VandyHacks"]}
+            />
           </p>
         </Reveal>
       </Section>
@@ -127,7 +134,18 @@ export default function Home() {
 
       <Section id="play" title="Off the clock">
         <Reveal>
-          <p className="prose">{offTheClock}</p>
+          <p className="prose">
+            {offTheClockBefore}
+            <a
+              href={letterboxdUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-link"
+            >
+              films
+            </a>
+            {offTheClockAfter}
+          </p>
         </Reveal>
       </Section>
 

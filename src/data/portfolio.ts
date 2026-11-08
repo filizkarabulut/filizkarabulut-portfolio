@@ -57,7 +57,7 @@ export const navSections: NavSection[] = [
 
 export const about = {
   /** 2–3 sentences, read in a narrow column. */
-  lead: "I'm a Computer Science and Applied Mathematics student at Vanderbilt University, interested in software engineering and AI/ML. I'm currently an AI Research Engineer Intern at Amplify, an open-source AI platform serving 10,000+ users and piloted by 40+ institutions. I also co-lead VandyHacks, Vanderbilt's student-run hackathon organization, which brings together 200+ participants annually.",
+  lead: "I'm a Computer Science and Applied Mathematics student at Vanderbilt University, interested in software engineering and AI/ML. I'm currently an AI Research Intern at Amplify, an open-source AI platform serving 10,000+ users and piloted by 40+ institutions. I also co-lead VandyHacks, Vanderbilt's student-run hackathon organization, which brings together 200+ participants annually.",
 };
 
 /* ------------------------------------------------------------------ */
@@ -445,6 +445,8 @@ export interface ExperienceItem {
   description?: string;
   /** This item's own tech tags. */
   tags?: string[];
+  /** Marks an in-flight project — shows a quiet "In Progress" pill by the title. */
+  inProgress?: boolean;
 }
 
 export interface ExperienceEntry {
@@ -454,6 +456,8 @@ export interface ExperienceEntry {
   orgHref?: string;
   /** Monospace, right-aligned. */
   dates: string;
+  /** Subtle secondary line under the role (e.g. a prior title in the same org). */
+  note?: string;
   /** Short muted description of the org/work (context line). */
   context?: string;
   /** Headline numbers shown as chips on the context line (unchanged wording). */
@@ -467,34 +471,35 @@ export interface ExperienceEntry {
 
 export const experience: ExperienceEntry[] = [
   {
-    role: "AI Research Engineer Intern",
+    role: "AI Research Intern",
     org: "AMPLIFY GenAI Innovation Center",
     orgHref: "https://www.amplifygenai.org/",
     dates: "May 2026 – Present",
     items: [
       {
-        title: "AgentCore Migration",
+        title: "Real-Time Multimodal AI Agent",
+        inProgress: true,
         description:
-          "Migrated sandboxed AI code execution to AWS Bedrock AgentCore, building session management, multi-round tool execution, and persistent file handling.",
-        tags: ["AWS Bedrock AgentCore", "DynamoDB", "S3"],
+          "Developing a real-time AI collaboration agent that combines live speech, visual context, and OpenCV-based whiteboard change detection to support context-aware interactions with configurable AI agents.",
+        tags: ["Python", "Node.js", "FastAPI", "OpenCV", "GPT Live", "Nova Sonic", "Amazon Bedrock"],
       },
       {
-        title: "Multimodal Meeting Agent",
+        title: "License Review & Redlining",
         description:
-          "Built a real-time agent combining conversation context with OpenCV-based whiteboard change detection.",
-        tags: ["Amazon Nova Sonic", "OpenCV", "FastAPI", "Python"],
+          "Enhanced a multi-tenant licensing plugin by redesigning the interface and enabling users to define custom standards for automated license review, redlining, and Word document generation.",
+        tags: ["TypeScript", "Node.js", "React", "OOXML"],
+      },
+      {
+        title: "AgentCore Code Interpreter Migration",
+        description:
+          "Migrated Amplify's sandboxed AI code execution from OpenAI Code Interpreter to AWS Bedrock AgentCore, implementing session management, multi-round tool execution, and persistent file storage.",
+        tags: ["Python", "JavaScript", "AWS Bedrock AgentCore", "AWS Lambda", "DynamoDB", "S3"],
       },
       {
         title: "AI Actions Frontend",
         description:
-          "Rebuilt the interface for connecting AI assistants to external APIs.",
-        tags: ["JavaScript", "TypeScript"],
-      },
-      {
-        title: "Multi-Tenant Licensing",
-        description:
-          "Refactored a licensing plugin to support multiple institutions while resolving tenant-isolation and security issues.",
-        tags: ["TypeScript", "Node.js", "React", "OOXML"],
+          "Redesigned and rebuilt Amplify's Actions interface, streamlining how users connect AI assistants to external APIs and configure integrations.",
+        tags: ["TypeScript", "React"],
       },
     ],
   },
@@ -504,14 +509,21 @@ export const experience: ExperienceEntry[] = [
     dates: "Jan 2026 – May 2026",
     items: [
       {
+        title: "IT Operations Automation",
         description:
-          "Automated timesheet, network-device, and classroom-record reconciliation in Python (pandas) and SQL, replacing manual CSV review for operations reporting.",
+          "Developed Python and SQL automation workflows to reconcile timesheet, network-device, and classroom records, replacing manual CSV review and streamlining operational reporting.",
         tags: ["Python", "pandas", "SQL"],
       },
       {
+        title: "Systems Integration",
         description:
-          "Integrated TDX ticketing with Crestron Fusion monitoring for campus-wide AV visibility, and resolved 50+ classroom AV, network, and control-system issues.",
-        tags: ["Crestron Fusion", "Python", "Microsoft SQL Server"],
+          "Integrated TDX ticketing with Crestron Fusion monitoring to improve campus-wide classroom AV visibility.",
+        tags: ["Python", "Microsoft SQL Server", "Crestron Fusion", "TDX"],
+      },
+      {
+        title: "Technical Support & Troubleshooting",
+        description:
+          "Resolved 50+ classroom AV, network, and control-system issues, supporting reliable classroom technology operations across campus.",
       },
     ],
   },
@@ -527,14 +539,19 @@ export const leadership: ExperienceEntry[] = [
     org: "VandyHacks",
     orgHref: "https://vandyhacks.org",
     dates: "Feb 2026 – Present",
+    note: "Previously Director of Hackathon Experience",
     items: [
       {
         description:
-          "Co-lead Vanderbilt's student-run hackathon and a 15-person executive board.",
+          "Co-lead Vanderbilt's student-run hackathon organization and manage a 15-member executive board.",
       },
       {
         description:
-          "Run finance, sponsorship, vendors, and operations for 150+ attendees, and expanded programming with a Y Combinator event and an Oracle-partnered hackathon.",
+          "Oversee sponsorships, finances, event operations, website development, and hackathon track design for events with 200+ participants.",
+      },
+      {
+        description:
+          "Expanded programming through a Y Combinator event and an Oracle-partnered hackathon.",
       },
     ],
   },
@@ -545,7 +562,7 @@ export const leadership: ExperienceEntry[] = [
     items: [
       {
         description:
-          "Plan social and community events for VU-WiSE's network of 400+ women in science, engineering, and mathematics.",
+          "Plan and coordinate social and community-building events for VU-WiSE, supporting a network of 400+ women in science, engineering, and mathematics.",
       },
     ],
   },
@@ -557,7 +574,7 @@ export const leadership: ExperienceEntry[] = [
 
 export const education = {
   school: "Vanderbilt University",
-  degree: "B.S. Computer Science & Applied Mathematics",
+  degree: "B.S. in Computer Science and Applied Mathematics",
   minor: "Minor in Engineering Management",
   dates: "Expected May 2029",
   /** Achievements — rendered as accent-tinted chips (stand out from coursework). */
@@ -566,10 +583,10 @@ export const education = {
   coursework: [
     "Data Structures",
     "Algorithms",
-    "Data Science",
-    "Multivariable Calculus",
+    "Intermediate Software Design",
     "Linear Algebra",
-    "Applied Behavioral Science",
+    "Multivariable Calculus",
+    "Data Science",
   ],
 };
 
@@ -578,7 +595,10 @@ export const education = {
 /* ------------------------------------------------------------------ */
 
 export const offTheClock =
-  "Away from the keyboard: playing violin, getting out on hiking trails, and watching (probably too much) film.";
+  "When I'm not at my keyboard, you'll probably find me playing the violin, hiking, swimming, sidequesting with friends, or watching (probably too many) films.";
+
+/** Letterboxd profile — the word "films" above links here. */
+export const letterboxdUrl = "https://letterboxd.com/flzkrblt/";
 
 /* ------------------------------------------------------------------ */
 /* Stickers (clickable lid) — now shortcuts that scroll to a section  */

@@ -735,6 +735,11 @@ a {
 #contact.section {
   padding-bottom: clamp(3rem, 8vh, 6rem);
 }
+/* About leads straight into Experience — trim ~18% off its trailing whitespace
+   so the two sit closer, while the top padding keeps the section spacious. */
+#about.section {
+  padding-bottom: clamp(2.4rem, 5.75vh, 4.1rem);
+}
 .section-inner {
   max-width: 720px;
   margin: 0;
@@ -764,6 +769,30 @@ a {
 }
 .prose:last-child {
   margin-bottom: 0;
+}
+
+/* Inline prose link — subtle hairline underline at rest, accent on hover. Keeps
+   the body colour and typography; no button or icon. */
+.inline-link {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-color: var(--line);
+  text-underline-offset: 3px;
+  transition:
+    color 140ms ease,
+    text-decoration-color 140ms ease;
+}
+.inline-link:hover {
+  color: var(--accent);
+  text-decoration-color: var(--accent);
+}
+
+/* Tighten the gap under the heading and give the section a deliberate close. */
+#play .section-head {
+  margin-bottom: 1.25rem;
+}
+#play.section {
+  padding-bottom: clamp(3.5rem, 8vh, 5.5rem);
 }
 
 /* Key/value rows (work cards, case-study header) */
@@ -805,6 +834,12 @@ a {
 /* Highlighted key numbers/results — brighter + medium weight, same wording. */
 .stat {
   color: var(--text-stat);
+  font-weight: 500;
+}
+/* Emphasised key phrases in prose (role title, org) — a touch stronger in
+   colour + weight, no colour badge. Quieter than .stat so numbers still lead. */
+.emph {
+  color: var(--text-strong);
   font-weight: 500;
 }
 
@@ -894,7 +929,7 @@ a {
   padding: 0;
 }
 .tag2 {
-  padding: 2px 10px;
+  padding: 2px 8px;
   border: 0.5px solid var(--line);
   border-radius: 999px;
   color: var(--text-meta);
@@ -973,6 +1008,26 @@ a {
   text-align: right;
 }
 
+/* Secondary line under the role (e.g. a prior title) — smaller + muted so it
+   reads as subordinate to the role title. No divider, no colour. */
+.xp-note {
+  margin: 0.2rem 0 0; /* ~3px under the role line */
+  color: var(--text-meta);
+  font-size: 0.8125rem; /* 13px */
+  line-height: 1.45;
+}
+
+/* Leadership entries sit a touch further apart than Experience's so the two
+   organizations read as distinct (scoped — Experience spacing is unchanged). */
+#leadership .xp:not(:last-child) {
+  padding-bottom: 1.75rem;
+}
+/* Tighter bullet rhythm within a Leadership entry (~13px) than Experience's
+   project list, since these are single accomplishments rather than projects. */
+#leadership .xp-items {
+  gap: 0.82rem;
+}
+
 /* Context line — muted org/work description + headline-number chips. */
 .xp-context {
   display: flex;
@@ -995,7 +1050,7 @@ a {
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 0.7rem; /* ~11px between bullet items */
+  gap: 1.25rem; /* ~20px between projects — clearer separation, no divider */
 }
 .xp-item {
   position: relative;
@@ -1017,9 +1072,28 @@ a {
 .xp-item__title {
   margin: 0;
   font-size: 0.9375rem; /* 15px */
-  font-weight: 500;
+  font-weight: 600; /* a touch more prominent than the description, same size */
   line-height: 1.4;
   color: var(--text-primary);
+}
+/* Quiet "In Progress" marker beside an active project's title — an outlined
+   mono pill, secondary to the title; wraps to the next line when tight. */
+.xp-item__status {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 0.5rem;
+  padding: 1px 8px;
+  border: 0.5px solid color-mix(in srgb, var(--accent) 40%, transparent);
+  border-radius: 999px;
+  color: var(--accent);
+  font-family: var(--font-mono), monospace;
+  font-weight: 400;
+  font-size: 0.6875rem; /* 11px */
+  letter-spacing: 0.01em;
+  line-height: 1.5;
+  white-space: nowrap;
+  vertical-align: middle;
+  transform: translateY(-1px);
 }
 .xp-item__desc {
   margin: 0.375rem 0 0; /* 6px between title and description */
@@ -1200,9 +1274,9 @@ a {
   }
 }
 /* Three groups: school+degree, achievements, coursework. */
-/* Degree + minor read as one block: ~4px between the two lines. */
+/* Degree + minor read as one tight block: ~2px between the two lines. */
 .edu-minor {
-  margin-top: 0.25rem; /* 4px (overrides the 8px .timeline-line default) */
+  margin-top: 0.125rem; /* 2px (overrides the 8px .timeline-line default) */
 }
 /* Achievement chips — accent-tinted, 16px below the minor line. */
 .edu-chips {
@@ -1212,6 +1286,14 @@ a {
   list-style: none;
   margin: 1rem 0 0; /* 16px above */
   padding: 0;
+}
+/* Understated academic badges — a hair less accent tint than the default chip,
+   same blue text. (Lower again in light mode, where the base tint is lighter.) */
+.edu-chips {
+  --chip-tint: 12%;
+}
+:root[data-theme="light"] .edu-chips {
+  --chip-tint: 8%;
 }
 /* Coursework — label inline on the left, quiet tags wrapping to its right,
    20px below the chips. */
@@ -1237,6 +1319,11 @@ a {
   padding: 2px 8px;
   white-space: nowrap;
 }
+/* Slightly tighter vertical rhythm between wrapped rows of coursework tags
+   (column gap between tags stays the same). */
+.edu-coursework .tag2-row {
+  row-gap: 4px;
+}
 /* Narrow screens: the label sits above the tags. */
 @media (max-width: 640px) {
   .edu-coursework {
@@ -1247,6 +1334,10 @@ a {
 }
 
 /* ---- Contact ---- */
+/* Pull the email a touch closer to the heading (~17% tighter) than the default. */
+#contact .section-head {
+  margin-bottom: 1.45rem;
+}
 .contact {
   display: flex;
   flex-direction: column;
@@ -1273,14 +1364,19 @@ a {
   font-size: 0.8125rem; /* 13px */
   color: var(--muted);
   background: transparent;
-  border: 1px solid var(--line);
+  border: 1px solid var(--line-soft);
   border-radius: 6px;
   padding: 0.15rem 0.6rem;
   cursor: pointer;
+  transition:
+    color 140ms ease,
+    border-color 140ms ease,
+    background-color 140ms ease;
 }
 .copy-email__btn:hover {
   color: var(--fg);
-  border-color: rgba(255, 255, 255, 0.3);
+  border-color: var(--line);
+  background: var(--panel);
 }
 .contact-links {
   display: flex;
