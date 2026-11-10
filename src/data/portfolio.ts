@@ -823,7 +823,9 @@ export const projectCards: ProjectCard[] = [
     links: [
       { label: "Code", href: "https://github.com/devmutfak/devmutfak-repo" },
     ],
-    // TODO: add a short SpIQ webcam-feedback screenshot/demo at /public/projects/spiq.*
+    thumbnail: "/projects/spiq/poster.jpg",
+    thumbnailAlt: "SpIQ — real-time webcam delivery feedback on screen",
+    thumbnailVideo: "/projects/spiq/demo.mp4",
     caseStudySlug: "spiq",
     overview: [
       "Founded an AI communication coach that gives real-time feedback on interview and presentation delivery from webcam video.",
@@ -1115,10 +1117,10 @@ const askValiant: ProjectCaseStudyData = {
 
 const spiq: ProjectCaseStudyData = {
   demo: {
-    // TODO: drop the recording in and set src.
+    src: "/projects/spiq/demo.mp4",
+    poster: "/projects/spiq/poster.jpg",
     caption:
       "A short walkthrough of SpIQ: speaking to the webcam and getting real-time, on-screen feedback on delivery signals like eye contact, gestures, and head stability.",
-    placeholderHint: "Add demo.mp4 to /public/projects/spiq/",
   },
   problem: [
     "Interview and presentation delivery is hard to self-assess — most feedback is subjective and arrives long after the moment has passed. SpIQ was built at HackMT 2026 to give speakers objective, real-time feedback on how they come across on camera.",
