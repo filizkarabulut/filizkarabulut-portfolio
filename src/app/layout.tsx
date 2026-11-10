@@ -1,6 +1,15 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Space_Grotesk, Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
+
+export const viewport: Viewport = {
+  // Matches the site's dark/light left-column backgrounds so the browser UI
+  // (mobile address bar) blends with the page in each theme.
+  themeColor: [
+    { media: "(prefers-color-scheme: dark)", color: "#0c0c0e" },
+    { media: "(prefers-color-scheme: light)", color: "#f6f6f8" },
+  ],
+};
 
 /** Characterful display face for headings. */
 const display = Space_Grotesk({
@@ -24,7 +33,7 @@ const mono = JetBrains_Mono({
 });
 
 const siteDescription =
-  "Filiz Karabulut — CS & Applied Math student at Vanderbilt, AI engineer, and VandyHacks President. A sticker-covered laptop you can click through.";
+  "Filiz Karabulut — CS & Applied Math student at Vanderbilt, AI Research Intern, and VandyHacks Co-President. A sticker-covered laptop you can click through.";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://filizkarabulut.com"),

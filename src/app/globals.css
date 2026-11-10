@@ -144,6 +144,31 @@ a {
   min-height: 100dvh;
 }
 
+/* Skip link — hidden until keyboard focus, then pinned top-left over content. */
+.skip-link {
+  position: absolute;
+  left: 0.75rem;
+  top: -3rem;
+  z-index: 1000;
+  padding: 0.5rem 0.9rem;
+  border-radius: 0.5rem;
+  background: var(--accent);
+  color: #0c0c0e;
+  font-weight: 600;
+  text-decoration: none;
+  transition: top 0.15s ease;
+}
+.skip-link:focus-visible,
+.skip-link:focus {
+  top: 0.75rem;
+  outline: 2px solid var(--fg);
+  outline-offset: 2px;
+}
+/* The content region is focusable only as the skip-link target — no focus ring. */
+.layout__right:focus {
+  outline: none;
+}
+
 /* Mobile-first: one stacked column (laptop on top, sections below). */
 .layout {
   display: block;

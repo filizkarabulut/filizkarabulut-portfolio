@@ -99,6 +99,9 @@ export function Shell({
 
   return (
     <div className="layout">
+      <a href="#main-content" className="skip-link">
+        Skip to content
+      </a>
       <div className="layout__left">
         <div className="sidebar">
           <header className="sidebar-id">
@@ -185,7 +188,9 @@ export function Shell({
         </ul>
       </nav>
 
-      <div className="layout__right">{children}</div>
+      <div className="layout__right" id="main-content" tabIndex={-1}>
+        {children}
+      </div>
     </div>
   );
 }

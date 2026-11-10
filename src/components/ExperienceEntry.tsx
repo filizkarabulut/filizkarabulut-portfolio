@@ -59,12 +59,12 @@ export function ExperienceEntry({ entry: e }: { entry: Entry }) {
         {e.items.map((it, i) => (
           <li key={i} className="xp-item">
             {it.title && (
-              <h4 className="xp-item__title">
+              <h3 className="xp-item__title">
                 {it.title}
                 {it.inProgress && (
                   <span className="xp-item__status">In&nbsp;Progress</span>
                 )}
-              </h4>
+              </h3>
             )}
             {it.description && (
               <p className="xp-item__desc">

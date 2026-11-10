@@ -100,6 +100,11 @@ export function Sticker({
           width={image!.width}
           height={image!.height}
           className="sticker-img"
+          // Stickers render small (≤~215px on the lid, 42px in the mini nav), but
+          // the source art is multiple thousands of px wide. Without `sizes` the
+          // optimizer serves the full-resolution variant (w=3840); these generous
+          // slot hints let it pick a far smaller candidate, cutting the LCP image.
+          sizes={mini ? "48px" : "(max-width: 700px) 45vw, 240px"}
           onError={() => setImgFailed(true)}
           priority={!mini && sticker.size === "XL"}
         />

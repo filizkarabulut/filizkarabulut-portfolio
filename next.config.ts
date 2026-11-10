@@ -1,8 +1,26 @@
 import type { NextConfig } from "next";
 
+/** Baseline security headers applied to every response. */
+const securityHeaders = [
+  // Don't let browsers MIME-sniff responses away from the declared type.
+  { key: "X-Content-Type-Options", value: "nosniff" },
+  // Send only the origin (not the full path) on cross-origin navigations.
+  { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+  // Disallow this site being framed by others (clickjacking).
+  { key: "X-Frame-Options", value: "DENY" },
+  // Opt out of powerful features this static site never uses.
+  {
+    key: "Permissions-Policy",
+    value: "camera=(), microphone=(), geolocation=(), browsing-topics=()",
+  },
+];
+
 const nextConfig: NextConfig = {
   // Hide the Next.js dev indicator overlay during local development.
   devIndicators: false,
+  async headers() {
+    return [{ source: "/:path*", headers: securityHeaders }];
+  },
   // Pin the workspace root to this project (a stray lockfile lives one dir up).
   turbopack: {
     root: __dirname,
