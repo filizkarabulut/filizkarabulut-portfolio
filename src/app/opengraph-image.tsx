@@ -19,7 +19,6 @@ const FG = "#e8e8ea"; // --fg
 const MUTED = "#8a8a93"; // --muted
 const TILE = "#1f2937"; // favicon tile
 const TILE_FG = "#f4f4f5"; // favicon "FK"
-const ACCENT = "#8ab4ff"; // --accent
 
 /**
  * Fetch a Google Font as raw TTF so Satori can embed it. Requesting the css2
@@ -130,17 +129,6 @@ export default async function Image() {
         >
           {subtitle}
         </div>
-
-        {/* Thin accent rule echoing the site's --accent. */}
-        <div
-          style={{
-            marginTop: 40,
-            width: 120,
-            height: 4,
-            borderRadius: 2,
-            background: ACCENT,
-          }}
-        />
       </div>
     ),
     { ...size, fonts: fonts.length ? fonts : undefined },
